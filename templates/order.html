@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Order</title>
+<style>
+
+</style>
+{% endblock %}
+
+{% block body %}
+<h1 style="text-align:center; background-color:LightSkyBlue;">Narudžba</h1>
+<!-- <br>
+<button onclick="window.location.href='/order'">Narudžba</button>
+<button onclick="window.location.href='/proizvodnja'">Proizvodnja</button>
+<button onclick="window.location.href='/gotoviproizvodi'">Gotovi proizvodi</button>
+<br> -->
+<form action="order" METHOD="POST">
+    <input type="text" placeholder="Proizvod" name="proizvod">
+    <input type="submit" value="Naruči" class="btn btn-secondarty">
+    <!--  <select name="order" id="order">
+                    <option value="Vratilo_1">Vratilo 1</option>
+                    <option value="Vratilo_2">Vratilo 2</option>
+                    <option value="Osovina_1">Osovina 1</option>
+                    <option value="Osovina_2">Osovina 2</option>
+-->
+
+</form>
+
+{% endblock %}

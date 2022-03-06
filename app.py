@@ -33,7 +33,7 @@ def order():
             db.session.add(new_product)
             db.session.commit()
             return redirect("/order")
-        except:
+        except all:
             return "Pojavio se problem! Pokušajte ponovno."
 
     else:

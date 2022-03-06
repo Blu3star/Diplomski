@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<style>
+    table,
+    th,
+    td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+</style>
+<title>Proizvodnja</title>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1 id="Naslov">Proizvodnja</h1>
+    <br>
+    <button onclick="window.location.href='/order'">Narudžba</button>
+    <button onclick="window.location.href='/manufacturing'">Proizvodnja</button>
+    <button onclick="window.location.href='/finishedproduct'">Gotovi proizvodi</button>
+</div>
+
+<p>Naručeni proizvodi:</p>
+<table>
+    <tr>
+        <th>ID Proizvoda</th>
+        <th>Stroj 1</th>
+    </tr>
+    <tr>
+        <td>a</td>
+        <td></td>
+    </tr>
+</table>
+
+<p>Proizvodi u proizvodnji:</p>
+<table>
+    <tr>
+        <th>ID Proizvoda</th>
+        <th>Stroj 1</th>
+    </tr>
+    <tr>
+        <td>a</td>
+        <td>a</td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <th>Status</th>
+    </tr>
+    <tr>
+        <td>
+            <select class="statusi">
+                <option value="operacija">Operacija</option>
+                <option value="transport">Transport</option>
+                <option value="cekanje, zastoj">Čekanje, zastoj</option>
+                <option value="skladište">Skladište</option>
+                <option value="kontrola">Kontrola</option>
+            </select>
+        </td>
+    </tr>
+</table>
+{% endblock %}

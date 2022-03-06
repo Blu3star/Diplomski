@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, redirect, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -22,31 +22,33 @@ def index():
     return render_template("index.html")
 
 
-# @app.route("/order", methods=["POST", "GET"])
-@app.route("/order")
+@app.route("/order", methods=["POST", "GET"])
+# @app.route("/order")
 def order():
-    # if request.method == "POST":
-    #     naruci_proizvod = request.form["proizvod"]
-    #     novi_proizvod = Order(content=naruci_proizvod)
-    #     try:
-    #         db.session.add(novi_proizvod)
-    #         db.session.commit()
-    #         return redirect("/order")
-    #     except:
-    #         return "Greška u naručivanju proizvoda. Molim pokušajte ponovno."
-    # else:
-    #     order = Order.query.order_by(Order.date_created)
-    return render_template("order.html")
+    if request.method == "POST":
+        product_name = request.form["product"]
+        new_product = Order(name=product_name)
+
+        try:
+            db.session.add(new_product)
+            db.session.commit()
+            return redirect("/order")
+        except:
+            return "Pojavio se problem! Pokušajte ponovno."
+
+    else:
+        product = Order.query.order_by(Order.date_created)
+        return render_template("order.html", product=product)
 
 
-@app.route("/proizvodnja")
+@app.route("/manufacturing")
 def proizvodnja():
-    return render_template("proizvodnja.html")
+    return render_template("manufacturing.html")
 
 
-@app.route("/gotoviproizvodi")
+@app.route("/finishedproduct")
 def gotoviproizvodi():
-    return render_template("gotoviproizvodi.html")
+    return render_template("finishedproduct.html")
 
 
 if __name__ == "__main__":

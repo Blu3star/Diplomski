@@ -8,22 +8,33 @@
 {% endblock %}
 
 {% block body %}
-<h1 style="text-align:center; background-color:LightSkyBlue;">Narudžba</h1>
-<!-- <br>
-<button onclick="window.location.href='/order'">Narudžba</button>
-<button onclick="window.location.href='/proizvodnja'">Proizvodnja</button>
-<button onclick="window.location.href='/gotoviproizvodi'">Gotovi proizvodi</button>
-<br> -->
-<form action="order" METHOD="POST">
-    <input type="text" placeholder="Proizvod" name="proizvod">
-    <input type="submit" value="Naruči" class="btn btn-secondarty">
-    <!--  <select name="order" id="order">
-                    <option value="Vratilo_1">Vratilo 1</option>
-                    <option value="Vratilo_2">Vratilo 2</option>
-                    <option value="Osovina_1">Osovina 1</option>
-                    <option value="Osovina_2">Osovina 2</option>
--->
+<div class="content">
+    <h1 id="Naslov">Narudžba</h1>
+    <br>
+    <button onclick="window.location.href='/order'">Narudžba</button>
+    <button onclick="window.location.href='/manufacturing'">Proizvodnja</button>
+    <button onclick="window.location.href='/finishedproduct'">Gotovi proizvodi</button>
+</div>
 
-</form>
+<div class="container">
+    <form action="order" METHOD="POST">
+        <label for="order">Izaberite proizvod koji želite naručiti:</label>
+        <input list="products" name="product" id="product">
+        <datalist id="products">
+            <option value="Vratilo 1"></option>
+            <option value="Vratilo 2"></option>
+            <option value="Osovina 1"></option>
+            <option value="Osovina 2"></option>
+        </datalist>
+        <input type="submit" value="Naruči" class="btn btn-secondarty">
 
+    </form>
+
+    {% for order in product %}
+    <h4>
+        {{order.name}}
+    </h4>
+
+    {% endfor %}
+</div>
 {% endblock %}

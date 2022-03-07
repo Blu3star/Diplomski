@@ -19,15 +19,17 @@ body {
 }
 .btn:hover{
     background-color: white;
+    border-color: red;
+    outline: 50px auto red;
 }
 .btn-1{
     background-color: skyblue;
 }
 .btn-2{
-    background-color: palegreen;
+    background-color: white;
+    border-color: red;
+    outline: 50px auto red;
 }
 .btn-3{
     background-color: lightsalmon;
 }
-
-

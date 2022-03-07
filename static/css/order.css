@@ -11,17 +11,18 @@ body {
 }
 
 .btn{
-    padding: 15px;
+    padding: 10px;
     font-size: large;
-    border: none;
-    width: 20%;
-    border-radius: 8px;
 }
 .btn:hover{
     background-color: white;
+    border-color: red;
+    outline: 50px auto red;
 }
 .btn-1{
-    background-color: skyblue;
+    background-color: white;
+    order-color: red;
+    outline: 50px auto red;
 }
 .btn-2{
     background-color: palegreen;
@@ -29,5 +30,6 @@ body {
 .btn-3{
     background-color: lightsalmon;
 }
-
-
+.btn-secondary{
+    background-color: tomato;
+}

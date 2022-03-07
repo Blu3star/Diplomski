@@ -19,6 +19,8 @@ body {
 }
 .btn:hover{
     background-color: white;
+    border-color: red;
+    outline: 50px auto red;
 }
 .btn-1{
     background-color: skyblue;
@@ -27,7 +29,7 @@ body {
     background-color: palegreen;
 }
 .btn-3{
-    background-color: lightsalmon;
+    background-color: white;
+    border-color: red;
+    outline: 50px auto red;
 }
-
-

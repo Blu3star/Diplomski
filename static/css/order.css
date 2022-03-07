@@ -21,7 +21,7 @@ body {
 }
 .btn-1{
     background-color: white;
-    order-color: red;
+    border-color: red;
     outline: 50px auto red;
 }
 .btn-2{

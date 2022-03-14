@@ -24,9 +24,12 @@ body {
     background-color: skyblue;
 }
 .btn-2{
-    background-color: palegreen;
+    background-color: gold;
 }
 .btn-3{
+    background-color: palegreen;
+}
+.btn-4{
     background-color: lightsalmon;
 }
 

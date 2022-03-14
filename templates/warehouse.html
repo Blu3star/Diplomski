@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/warehouse.css') }}">
+<title>Skladište</title>
+<style>
+    table,
+    th,
+    td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+    .podatak {
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="content">
+    <h1 id="Naslov">Skladište</h1>
+    <br>
+    <button class="btn btn-1" , onclick="window.location.href='/order'">Narudžba</button>
+    <button class="btn btn-2" , onclick="window.location.href='/warehouse'">Skladište</button>
+    <button class="btn btn-3" , onclick="window.location.href='/manufacturing'">Proizvodnja</button>
+    <button class="btn btn-4" , onclick="window.location.href='/finishedproduct'">Gotovi proizvodi</button>
+</div>
+
+
+<form action="warehouse" METHOD="POST">
+    <label for="warehouse">Izaberite sirovac i količinu (u mm) koja je pristigla:</label>
+    <input list="sirovci" name="sirovac" id="sirovac">
+    <datalist id="sirovci">
+        <option value="Čelična šipka 20x20"></option>
+        <option value="Čelična šipka 30x30x"></option>
+        <option value="Čelična šipka fi20"></option>
+        <option value="Čelična šipka fi30"></option>
+    </datalist>
+    <input type="number" name="kolicina" id="kolicina">
+    <input type="submit" value="Dodaj" class="btn-secondary">
+</form>
+<p>Sirovci dostupni na skladištu:</p>
+<table>
+    <tr>
+        <th>Sirovac</th>
+        <th>Količina (mm)</th>
+    </tr>
+    <tr>
+        <td>
+            {% for warehouse in sirovac %}
+            <h4>
+                {{warehouse.name}}
+            </h4>
+            {% endfor %}
+        </td>
+        <td>
+            {% for warehouse in sirovac %}
+            <h4 class="podatak">
+                {{warehouse.quantity}}
+            </h4>
+            {% endfor %}
+        </td>
+    </tr>
+</table>
+
+{% endblock %}

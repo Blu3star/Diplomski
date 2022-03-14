@@ -11,8 +11,11 @@ body {
 }
 
 .btn{
-    padding: 10px;
+    padding: 15px;
     font-size: large;
+    border: none;
+    width: 20%;
+    border-radius: 8px;
 }
 .btn:hover{
     background-color: white;
@@ -25,11 +28,21 @@ body {
     outline: 50px auto red;
 }
 .btn-2{
-    background-color: palegreen;
+    background-color: gold;
 }
 .btn-3{
+    background-color: palegreen;
+}
+.btn-4{
     background-color: lightsalmon;
 }
 .btn-secondary{
     background-color: tomato;
+    padding: 15px;
+    font-size: large;
+}
+.btn-secondary:hover{
+    background-color: white;
+    border-color: red;
+    outline: 50px auto red;
 }

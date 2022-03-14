@@ -4,7 +4,12 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/order.css') }}">
 <title>Order</title>
 <style>
-
+    table,
+    th,
+    td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
 </style>
 {% endblock %}
 
@@ -13,8 +18,9 @@
     <h1 id="Naslov">Narudžba</h1>
     <br>
     <button class="btn btn-1" , onclick="window.location.href='/order'">Narudžba</button>
-    <button class="btn btn-2" , onclick="window.location.href='/manufacturing'">Proizvodnja</button>
-    <button class="btn btn-3" , onclick="window.location.href='/finishedproduct'">Gotovi proizvodi</button>
+    <button class="btn btn-2" , onclick="window.location.href='/warehouse'">Skladište</button>
+    <button class="btn btn-3" , onclick="window.location.href='/manufacturing'">Proizvodnja</button>
+    <button class="btn btn-4" , onclick="window.location.href='/finishedproduct'">Gotovi proizvodi</button>
 </div>
 
 <div class="container">
@@ -27,15 +33,38 @@
             <option value="Osovina 1"></option>
             <option value="Osovina 2"></option>
         </datalist>
-        <input type="submit" value="Naruči" class="btn btn-secondary">
+        <input type="submit" value="Naruči" class="btn-secondary">
 
     </form>
-
-    {% for order in product %}
-    <h4>
-        {{order.name}}
-    </h4>
-
-    {% endfor %}
+    <table>
+        <tr>
+            <th>ID proizvoda</th>
+            <th>Naručeni proizvodi</th>
+            <th>Datum narudžbe</th>
+        </tr>
+        <tr>
+            <th>
+                {% for order in product %}
+                <h4>
+                    {{order.id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for order in product %}
+                <h4>
+                    {{order.name}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for order in product %}
+                <h4>
+                    {{order.date_created}}
+                </h4>
+                {% endfor %}
+            </th>
+        </tr>
+    </table>
 </div>
 {% endblock %}

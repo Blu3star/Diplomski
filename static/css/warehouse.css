@@ -26,13 +26,13 @@ body {
     background-color: skyblue;
 }
 .btn-2{
-    background-color: gold;
+    background-color: white;
+    border-color: red;
+    outline: 50px auto red;
 }
 .btn-3{
     background-color: palegreen;
 }
 .btn-4{
-    background-color: white;
-    border-color: red;
-    outline: 50px auto red;
+    background-color: lightsalmon;
 }

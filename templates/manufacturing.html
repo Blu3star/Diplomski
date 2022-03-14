@@ -18,19 +18,28 @@
     <h1 id="Naslov">Proizvodnja</h1>
     <br>
     <button class="btn btn-1" , onclick="window.location.href='/order'">Narudžba</button>
-    <button class="btn btn-2" , onclick="window.location.href='/manufacturing'">Proizvodnja</button>
-    <button class="btn btn-3" , onclick="window.location.href='/finishedproduct'">Gotovi proizvodi</button>
+    <button class="btn btn-2" , onclick="window.location.href='/warehouse'">Skladište</button>
+    <button class="btn btn-3" , onclick="window.location.href='/manufacturing'">Proizvodnja</button>
+    <button class="btn btn-4" , onclick="window.location.href='/finishedproduct'">Gotovi proizvodi</button>
 </div>
 
 <p>Naručeni proizvodi:</p>
 <table>
     <tr>
         <th>ID Proizvoda</th>
-        <th>Stroj 1</th>
+        <th>Stroj</th>
     </tr>
     <tr>
-        <td>a</td>
-        <td></td>
+        <th>
+            {% for order in product %}
+            <h4>
+                {{order.id}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+
+        </th>
     </tr>
 </table>
 
@@ -46,20 +55,4 @@
     </tr>
 </table>
 
-<table>
-    <tr>
-        <th>Status</th>
-    </tr>
-    <tr>
-        <td>
-            <select class="statusi">
-                <option value="operacija">Operacija</option>
-                <option value="transport">Transport</option>
-                <option value="cekanje, zastoj">Čekanje, zastoj</option>
-                <option value="skladište">Skladište</option>
-                <option value="kontrola">Kontrola</option>
-            </select>
-        </td>
-    </tr>
-</table>
 {% endblock %}

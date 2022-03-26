@@ -60,19 +60,19 @@ def order():
 
 
 @app.route("/warehouse", methods=["POST", "GET"])
-def skladiste():
+def warehouse():
     if request.method == "POST":
-        sirovac_name = request.form["sirovac"]
-        kolicina_name = request.form["kolicina"]
-        new_sirovac = Warehouse(name=sirovac_name, quantity=kolicina_name)
+        raw_mat_name = request.form["sirovac"]
+        quantity_value = request.form["kolicina"]
+        new_raw_mat = Warehouse(name=raw_mat_name, quantity=quantity_value)
         user_table = pd.read_sql_table(table_name="warehouse", con=engine)
         exists = False
         for _, row in user_table.iterrows():
-            if row["name"] == sirovac_name:
+            if row["name"] == raw_mat_name:
                 print(row["quantity"])
                 table_val = row["quantity"]
-                updated_value = table_val + int(kolicina_name)
-                new_sirovac = Warehouse(name=sirovac_name, quantity=updated_value)
+                updated_value = table_val + int(quantity_value)
+                new_raw_mat = Warehouse(name=raw_mat_name, quantity=updated_value)
                 exists = True
 
         try:
@@ -80,30 +80,30 @@ def skladiste():
                 conn = engine.connect()
                 stmt = (
                     update(Warehouse)
-                    .where(Warehouse.name == sirovac_name)
+                    .where(Warehouse.name == raw_mat_name)
                     .values(quantity=updated_value)
                 )
                 conn.execute(stmt)
             else:
-                db.session.add(new_sirovac)
+                db.session.add(new_raw_mat)
             db.session.commit()
             return redirect("/warehouse")
         except all:
             return "Pojavio se problem! Pokušajte ponovno."
 
     else:
-        sirovac = Warehouse.query.order_by(Warehouse.id)
-        return render_template("warehouse.html", sirovac=sirovac)
+        raw_mat = Warehouse.query.order_by(Warehouse.id)
+        return render_template("warehouse.html", sirovac=raw_mat)
 
 
 @app.route("/manufacturing")
-def proizvodnja():
+def manufacturing():
     product = Order.query.order_by(Order.date_created)
     return render_template("manufacturing.html", product=product)
 
 
 @app.route("/finishedproduct")
-def gotoviproizvodi():
+def finished_product():
     return render_template("finishedproduct.html")
 
 

@@ -4,6 +4,7 @@ from datetime import datetime
 from sqlalchemy import create_engine, update
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
+import os
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
@@ -15,19 +16,37 @@ meta_data = db.MetaData(bind=engine)
 db.MetaData.reflect(meta_data)
 session = sessionmaker(bind=engine)
 
+ID = -1
+
 
 class Order(db.Model):
     __tablename__ = "order"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True,
+    )
+    order_id = db.Column(db.Integer)
     name = db.Column(db.String(500), nullable=False)
-    date_created = db.Column(db.DateTime, default=datetime.utcnow)
+    buyer_name = db.Column(db.String(500), nullable=False)
+    buyer_contact = db.Column(db.String(500), nullable=False)
+    date_created = db.Column(db.DateTime, default=datetime.now)
+
+    first_time = True
 
     def __repr__(self):
         return "<Name %r>" % self.id
 
+    def getLastOrderID(self):
+        order_table = pd.read_sql_table(table_name="order", con=engine)
+        column_ID = order_table["order_id"].tolist()
+        if len(column_ID):
+            return column_ID[-1]
 
-class Warehouse(db.Model):
-    __tablename__ = "warehouse"
+        return 9999
+
+
+class Input_Warehouse(db.Model):
+    __tablename__ = "input_warehouse"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
@@ -43,9 +62,23 @@ def index():
 
 @app.route("/order", methods=["POST", "GET"])
 def order():
+    global ID
+    if Order.first_time:
+        ID = Order().getLastOrderID()
+        Order.first_time = False
+
     if request.method == "POST":
         product_name = request.form["product"]
-        new_product = Order(name=product_name)
+        new_buyer_name = request.form["buyer_name"]
+        new_buyer_contact = request.form["phone"]
+
+        ID = ID + 1
+        new_product = Order(
+            name=product_name,
+            buyer_name=new_buyer_name,
+            buyer_contact=new_buyer_contact,
+            order_id=ID,
+        )
 
         try:
             db.session.add(new_product)
@@ -64,23 +97,23 @@ def warehouse():
     if request.method == "POST":
         raw_mat_name = request.form["sirovac"]
         quantity_value = request.form["kolicina"]
-        new_raw_mat = Warehouse(name=raw_mat_name, quantity=quantity_value)
-        user_table = pd.read_sql_table(table_name="warehouse", con=engine)
+        new_raw_mat = Input_Warehouse(name=raw_mat_name, quantity=quantity_value)
+        user_table = pd.read_sql_table(table_name="input_warehouse", con=engine)
         exists = False
         for _, row in user_table.iterrows():
             if row["name"] == raw_mat_name:
                 print(row["quantity"])
                 table_val = row["quantity"]
                 updated_value = table_val + int(quantity_value)
-                new_raw_mat = Warehouse(name=raw_mat_name, quantity=updated_value)
+                new_raw_mat = Input_Warehouse(name=raw_mat_name, quantity=updated_value)
                 exists = True
 
         try:
             if exists:
                 conn = engine.connect()
                 stmt = (
-                    update(Warehouse)
-                    .where(Warehouse.name == raw_mat_name)
+                    update(Input_Warehouse)
+                    .where(Input_Warehouse.name == raw_mat_name)
                     .values(quantity=updated_value)
                 )
                 conn.execute(stmt)
@@ -92,7 +125,7 @@ def warehouse():
             return "Pojavio se problem! Pokušajte ponovno."
 
     else:
-        raw_mat = Warehouse.query.order_by(Warehouse.id)
+        raw_mat = Input_Warehouse.query.order_by(Input_Warehouse.id)
         return render_template("warehouse.html", sirovac=raw_mat)
 
 
@@ -108,20 +141,12 @@ def finished_product():
 
 
 if __name__ == "__main__":
-
-    import os
-
     HOST = os.environ.get("SERVER_HOST", "localhost")
 
     try:
-
         PORT = int(os.environ.get("SERVER_PORT", "5555"))
 
     except ValueError:
-
         PORT = 5555
 
     app.run(HOST, PORT)
-
-# if __name__ == "__main__":
-#     app.run(debug=True)

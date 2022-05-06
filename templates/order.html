@@ -26,20 +26,28 @@
 <div class="container">
     <form action="order" METHOD="POST">
         <label for="order">Izaberite proizvod koji želite naručiti:</label>
-        <input list="products" name="product" id="product">
+        <input list="products" name="product" id="product"><br><br>
         <datalist id="products">
             <option value="Vratilo 1"></option>
             <option value="Vratilo 2"></option>
             <option value="Osovina 1"></option>
             <option value="Osovina 2"></option>
         </datalist>
-        <input type="submit" value="Naruči" class="btn-secondary">
+        <label for="buyer">Ime i prezime naručitelja:</label>
+        <input type="text" id="buyer_name" name="buyer_name"><br><br>
+        <label for="phone">Unesite kontakt broj:</label>
+        <input type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+        <small>Izgled: 123-456-7890</small><br><br>
+        <input type="submit" value="Naruči" class="btn-secondary"><br><br>
 
     </form>
     <table>
         <tr>
-            <th>ID proizvoda</th>
-            <th>Naručeni proizvodi</th>
+            <th>Auto ID</th>
+            <th>ID narudžbe</th>
+            <th>Naručeni proizvod</th>
+            <th>Kupac</th>
+            <th>Kontakt</th>
             <th>Datum narudžbe</th>
         </tr>
         <tr>
@@ -53,7 +61,28 @@
             <th>
                 {% for order in product %}
                 <h4>
+                    {{order.order_id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for order in product %}
+                <h4>
                     {{order.name}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for order in product %}
+                <h4>
+                    {{order.buyer_name}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for order in product %}
+                <h4>
+                    {{order.buyer_contact}}
                 </h4>
                 {% endfor %}
             </th>

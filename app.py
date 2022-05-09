@@ -55,6 +55,77 @@ class Input_Warehouse(db.Model):
         return "<Name %r>" % self.id
 
 
+class Part(db.Model):
+    __tablename__ = "part"
+    part_id = db.Column(db.Integer, primary_key=True)
+    part_name = db.Column(db.String(200))
+    part_raw_mat = db.Column(db.String(500))
+    part_length = db.Column(db.Integer)
+    part_price = db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<Name %r>" % self.id
+
+
+class Assembly(db.Model):
+    __tablename__ = "assembly"
+    assembly_id = db.Column(db.Integer, primary_key=True)
+    assembly_name = db.Column(db.String(200))
+    assembly_peaces = db.Column(db.Integer)
+    assembly_price = db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<Name %r>" % self.id
+
+
+class Machine(db.Model):
+    __tablename__ = "machine"
+    machine_id = db.Column(db.Integer, primary_key=True)
+    machine_name = db.Column(db.String(200))
+    machine_tool = db.Column(db.String(200))
+    tool_change_interval = db.Column(db.String(200))
+    machine_service = db.Column(db.String(200))
+    machined_parts = db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<Name %r>" % self.id
+
+
+class Worker(db.Model):
+    __tablename__ = "worker"
+    worker_id = db.Column(db.Integer, primary_key=True)
+    worker_name = db.Column(db.String(500))
+    worker_department = db.Column(db.String(200))
+
+    def __repr__(self):
+        return "<Name %r>" % self.id
+
+
+class Manufacturing(db.Model):
+    __tablename__ = "manufacturing"
+    auto_id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer)
+    machine_id = db.Column(db.Integer)
+    manufacturing_status = db.Column(db.String(200))
+    manufacturing_time = db.Column(db.String(200))
+    manufacturing_worker = db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<Name %r>" % self.id
+
+
+class Installation(db.Model):
+    __tablename__ = "installation"
+    auto_id = db.Column(db.Integer, primary_key=True)
+    part_id = db.Column(db.Integer)
+    installation_status = db.Column(db.String(200))
+    installation_time = db.Column(db.String(200))
+    installation_worker = db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<Name %r>" % self.id
+
+
 @app.route("/")
 def index():
     return render_template("index.html")

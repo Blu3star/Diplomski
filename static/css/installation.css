@@ -26,9 +26,7 @@ body {
 }
 
 .btn-1 {
-    background-color: white;
-    border-color: red;
-    outline: 50px auto red;
+    background-color: skyblue;
 }
 
 .btn-2 {
@@ -40,16 +38,6 @@ body {
 }
 
 .btn-4 {
-    background-color: lightsalmon;
-}
-
-.btn-secondary {
-    background-color: tomato;
-    padding: 15px;
-    font-size: large;
-}
-
-.btn-secondary:hover {
     background-color: white;
     border-color: red;
     outline: 50px auto red;

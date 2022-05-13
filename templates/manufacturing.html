@@ -20,38 +20,73 @@
     <button class="btn btn-1" , onclick="window.location.href='/order'">Narudžba</button>
     <button class="btn btn-2" , onclick="window.location.href='/warehouse'">Skladište</button>
     <button class="btn btn-3" , onclick="window.location.href='/manufacturing'">Proizvodnja</button>
-    <button class="btn btn-4" , onclick="window.location.href='/finishedproduct'">Gotovi proizvodi</button>
+    <button class="btn btn-4" , onclick="window.location.href='/installation'">Montaža</button>
+    <button class="btn btn-5" , onclick="window.location.href='/finishedproduct'">Gotovi proizvodi</button>
+    <button class="btn btn-6" , onclick="window.location.href='/statistic'">Statistika</button>
 </div>
 
-<p>Naručeni proizvodi:</p>
-<table>
-    <tr>
-        <th>ID Proizvoda</th>
-        <th>Stroj</th>
-    </tr>
-    <tr>
-        <th>
-            {% for order in product %}
-            <h4>
-                {{order.id}}
-            </h4>
-            {% endfor %}
-        </th>
-        <th>
-
-        </th>
-    </tr>
-</table>
 
 <p>Proizvodi u proizvodnji:</p>
 <table>
     <tr>
-        <th>ID Proizvoda</th>
-        <th>Stroj 1</th>
+        <th>Redni broj</th>
+        <th>ID narudžbe</th>
+        <th>ID osnovnog elementa</th>
+        <th>ID stroja</th>
+        <th>Status</th>
+        <th>Vrijeme obrade</th>
+        <th>Operater</th>
     </tr>
     <tr>
-        <td>a</td>
-        <td>a</td>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{auto_id}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{order_id}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{part_id}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{machine_id}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{manufacturing_status}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{manufacturing_time}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{manufacturing_worker}}
+            </h4>
+            {% endfor %}
+        </th>
     </tr>
 </table>
 

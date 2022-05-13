@@ -1,0 +1,34 @@
+{
+    "Sklop 1": [
+        {
+            "Osnovni element 1": "1",
+            "Osnovni element 2": "2",
+            "Osnovni element 3": "0",
+            "Osnovni element 4": "1"
+        }
+    ],
+    "Sklop 2": [
+        {
+            "Osnovni element 1": "2",
+            "Osnovni element 2": "1",
+            "Osnovni element 3": "0",
+            "Osnovni element 4": "0"
+        }
+    ],
+    "Sklop 3": [
+        {
+            "Osnovni element 1": "1",
+            "Osnovni element 2": "2",
+            "Osnovni element 3": "1",
+            "Osnovni element 4": "1"
+        }
+    ],
+    "Sklop 4": [
+        {
+            "Osnovni element 1": "0",
+            "Osnovni element 2": "1",
+            "Osnovni element 3": "1",
+            "Osnovni element 4": "1"
+        }
+    ]
+}

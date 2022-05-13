@@ -1,49 +1,20 @@
-part
 {
-    "plastika": [
+    "Osnovni element 1": [
         {
-            "id": "1",
-            "price": "100"
+            "sirovac": "Celicna sipka 20x20",
+            "duljina": "100"
         }
     ],
-    "staklo": [
+    "Osnovni element 2": [
         {
-            "id": "2",
-            "price": "200"
+            "sirovac": "Celicna sipka 30x30",
+            "duljina": "200"
         }
     ],
-    "zeljezo": [
+    "Osnovni element 3": [
         {
-            "id": "3",
-            "price": "500"
-        }
-    ],
-    "aluminij": [
-        {
-            "id": "4",
-            "price": "1000"
-        }
-    ]
-}
-
-assembly
-{
-    "prozor": [
-        {
-            "price": "1000",
-            "plastika": "10",
-            "staklo": "1",
-            "zeljezo": "10",
-            "aluminij": "0"
-        }
-    ],
-    "vrata": [
-        {
-            "price": "3000",
-            "plastika": "20",
-            "staklo": "2",
-            "zeljezo": "20",
-            "aluminij": "0"
+            "sirovac": "Celicna cijev fi40",
+            "duljina": "250"
         }
     ]
 }

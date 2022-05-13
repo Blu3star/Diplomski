@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/finishedproduct.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/installation.css') }}">
 <style>
     table,
     th,
@@ -10,12 +10,12 @@
         border-collapse: collapse;
     }
 </style>
-<title>Gotovi proizvodi</title>
+<title>Montaža</title>
 {% endblock %}
 
 {% block body %}
 <div class="content">
-    <h1 id="Naslov">Gotovi proizvodi</h1>
+    <h1 id="Naslov">Montaža</h1>
     <br>
     <button class="btn btn-1" , onclick="window.location.href='/order'">Narudžba</button>
     <button class="btn btn-2" , onclick="window.location.href='/warehouse'">Skladište</button>
@@ -25,14 +25,20 @@
     <button class="btn btn-6" , onclick="window.location.href='/statistic'">Statistika</button>
 </div>
 
-<p>Gotovi proizvodi:</p>
+
+<p>Proizvodi u montaži:</p>
 <table>
     <tr>
-        <th>ID Proizvoda</th>
+        <th>Redni broj</th>
+        <th>ID narudžbe</th>
+        <th>ID sklopa</th>
+        <th>ID osnovnog elementa</th>
+        <th>Status</th>
+        <th>Vrijeme montaže</th>
+        <th>Montažer</th>
     </tr>
     <tr>
-        <td>a</td>
+
     </tr>
 </table>
-
 {% endblock %}

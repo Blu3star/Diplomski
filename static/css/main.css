@@ -1,36 +1,48 @@
 body {
-    margin:0;
+    margin: 0;
     font-family: sans-serif;
     background-color: lightgrey;
 }
-.content{
+
+.content {
     margin: 10px;
     background-color: silver;
     text-align: center;
     height: 140px;
 }
 
-.btn{
+.btn {
     padding: 15px;
     font-size: large;
     border: none;
-    width: 20%;
+    width: 15%;
     border-radius: 8px;
 }
-.btn:hover{
+
+.btn:hover {
     background-color: white;
 }
-.btn-1{
+
+.btn-1 {
     background-color: skyblue;
 }
-.btn-2{
+
+.btn-2 {
     background-color: gold;
 }
-.btn-3{
+
+.btn-3 {
     background-color: palegreen;
 }
-.btn-4{
+
+.btn-4 {
     background-color: lightsalmon;
 }
 
+.btn-5 {
+    background-color: lightsteelblue;
+}
 
+.btn-6 {
+    background-color: plum;
+}

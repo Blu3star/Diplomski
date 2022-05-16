@@ -217,6 +217,7 @@ def putDataInTableWorker():
 class Manufacturing(db.Model):
     __tablename__ = "manufacturing"
     auto_id = db.Column(db.Integer, primary_key=True)
+    part_name = db.Column(db.String(200))
     order_id = db.Column(db.Integer)
     part_id = db.Column(db.Integer)
     machine_id = db.Column(db.Integer)
@@ -231,6 +232,7 @@ class Manufacturing(db.Model):
 class Installation(db.Model):
     __tablename__ = "installation"
     auto_id = db.Column(db.Integer, primary_key=True)
+    assembly_name = db.column(db.String(200))
     order_id = db.Column(db.Integer)
     installation_id = db.Column(db.Integer)
     part_id = db.Column(db.Integer)
@@ -248,15 +250,17 @@ def index():
 
 
 def getResourceFromWarehouse(part_detail):
+
     input_table = pd.read_sql_table(table_name="input_warehouse", con=engine)
     raw_mat_name = input_table["name"].tolist()
+
     if part_detail in raw_mat_name:
-        print("getResourceFromWarehouse")
+
         row = input_table.loc[input_table.name == part_detail]
-        print(row)
         return int(row.quantity)
+
     else:
-        print("error")
+
         return -1
 
 
@@ -281,35 +285,33 @@ def order():
         )
 
         for part_name in j_part_data:
+
             if product_name == part_name:
-                print(part_name)
+
                 if type(j_part_data[part_name]) == type([]):
+
                     for part_details in j_part_data[part_name]:
-                        print(part_details)
-                        print(part_details[list(part_details.keys())[0]])
-                        length_in_stock = getResourceFromWarehouse(
-                            part_details[list(part_details.keys())[0]]
-                        )
-                        if length_in_stock >= int(
-                            part_details[list(part_details.keys())[1]]
-                        ):
-                            new_value = length_in_stock - int(
-                                part_details[list(part_details.keys())[1]]
-                            )
+
+                        part_raw_mat_name = part_details[list(part_details.keys())[0]]
+                        part_raw_mat_length = part_details[list(part_details.keys())[1]]
+                        length_in_stock = getResourceFromWarehouse(part_raw_mat_name)
+
+                        if length_in_stock >= int(part_raw_mat_length):
+
+                            new_value = length_in_stock - int(part_raw_mat_length)
                             conn = engine.connect()
                             stmt = (
                                 update(Input_Warehouse)
-                                .where(
-                                    Input_Warehouse.name
-                                    == part_details[list(part_details.keys())[0]]
-                                )
+                                .where(Input_Warehouse.name == part_raw_mat_name)
                                 .values(quantity=new_value)
                             )
                             conn.execute(stmt)
                             db.session.add(new_product)
                             db.session.commit()
                             return redirect("/order")
+
                         else:
+
                             return "Nema dovoljne količine materijala na skladištu!"
 
         for assembly_name in j_assembly_data:

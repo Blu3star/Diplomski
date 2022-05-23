@@ -65,6 +65,16 @@ class Input_Warehouse(db.Model):
         return "<Name %r>" % self.id
 
 
+class Warehouse(db.Model):
+    __tablename__ = "warehouse"
+    auto_id = db.Column(db.Integer, primary_key=True)
+    part_name = db.Column(db.String(200))
+    part_quantity = db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<Name %r>" % self.id
+
+
 class Part(db.Model):
     __tablename__ = "part"
     part_id = db.Column(db.Integer, primary_key=True)
@@ -122,9 +132,12 @@ class Assembly(db.Model):
 
 def putDataInTableAssembly():
     assembly_data = [
-        Assembly(assembly_name="Sklop 1", assembly_peaces="5", assembly_price="1000"),
-        Assembly(assembly_name="Sklop 2", assembly_peaces="7", assembly_price="1500"),
-        Assembly(assembly_name="Sklop 3", assembly_peaces="4", assembly_price="800"),
+        Assembly(assembly_name="Sklop 1",
+                 assembly_peaces="5", assembly_price="1000"),
+        Assembly(assembly_name="Sklop 2",
+                 assembly_peaces="7", assembly_price="1500"),
+        Assembly(assembly_name="Sklop 3",
+                 assembly_peaces="4", assembly_price="800"),
     ]
     Session = sessionmaker()
     Session.configure(bind=engine)
@@ -249,15 +262,20 @@ def index():
     return render_template("index.html")
 
 
-def getResourceFromWarehouse(part_detail):
+def getResourceFromWarehouse(part_detail, table, column):
 
-    input_table = pd.read_sql_table(table_name="input_warehouse", con=engine)
-    raw_mat_name = input_table["name"].tolist()
+    input_table = pd.read_sql_table(table_name=table, con=engine)
+    raw_mat_name = input_table[column].tolist()
 
-    if part_detail in raw_mat_name:
+    if table == 'input_warehouse':
+        if part_detail in raw_mat_name:
+            row = input_table.loc[input_table.name == part_detail]
+            return int(row.quantity)
 
-        row = input_table.loc[input_table.name == part_detail]
-        return int(row.quantity)
+    elif table == 'warehouse':
+        if part_detail in raw_mat_name:
+            row = input_table.loc[input_table.part_name == part_detail]
+            return int(row.part_quantity)
 
     else:
 
@@ -292,13 +310,17 @@ def order():
 
                     for part_details in j_part_data[part_name]:
 
-                        part_raw_mat_name = part_details[list(part_details.keys())[0]]
-                        part_raw_mat_length = part_details[list(part_details.keys())[1]]
-                        length_in_stock = getResourceFromWarehouse(part_raw_mat_name)
+                        part_raw_mat_name = part_details[list(
+                            part_details.keys())[0]]
+                        part_raw_mat_length = part_details[list(
+                            part_details.keys())[1]]
+                        length_in_stock = getResourceFromWarehouse(
+                            part_raw_mat_name, "input_warehouse", "name")
 
                         if length_in_stock >= int(part_raw_mat_length):
 
-                            new_value = length_in_stock - int(part_raw_mat_length)
+                            new_value = length_in_stock - \
+                                int(part_raw_mat_length)
                             conn = engine.connect()
                             stmt = (
                                 update(Input_Warehouse)
@@ -315,12 +337,31 @@ def order():
                             return "Nema dovoljne količine materijala na skladištu!"
 
         for assembly_name in j_assembly_data:
+
             if product_name == assembly_name:
-                print(assembly_name)
+
                 if type(j_assembly_data[assembly_name]) == type([]):
+
                     for assembly_details in j_assembly_data[assembly_name]:
-                        print(assembly_details)
-                        print(assembly_details[list(assembly_details.keys())[0]])
+
+                        for assembly_detail in assembly_details:
+                            needed_part_name = assembly_detail
+                            needed_part_quantity = assembly_details[assembly_detail]
+
+                            quantity_in_stock = getResourceFromWarehouse(
+                                needed_part_name, "warehouse", "part_name")
+
+                            if quantity_in_stock >= int(needed_part_quantity):
+                                new_part_value = quantity_in_stock - \
+                                    int(needed_part_quantity)
+                                conn = engine.connect()
+                                stmt = (update(Warehouse).where(
+                                    Warehouse.part_name == needed_part_name).values(part_quantity=new_part_value))
+                                conn.execute(stmt)
+                                db.session.add(new_product)
+                                db.session.commit()
+                            else:
+                                return "Nema dovoljne količine osnovnih elemenata na skladištu!"
 
         try:
             db.session.add(new_product)
@@ -334,20 +375,27 @@ def order():
         return render_template("order.html", product=product)
 
 
-@app.route("/warehouse", methods=["POST", "GET"])
-def warehouse():
+@app.route("/first_btn", methods=["POST", "GET"])
+def first_button():
     if request.method == "POST":
         raw_mat_name = request.form["sirovac"]
         quantity_value = request.form["kolicina"]
-        new_raw_mat = Input_Warehouse(name=raw_mat_name, quantity=quantity_value)
-        user_table = pd.read_sql_table(table_name="input_warehouse", con=engine)
+
+        new_raw_mat = Input_Warehouse(
+            name=raw_mat_name, quantity=quantity_value)
+
+        user_table = pd.read_sql_table(
+            table_name='input_warehouse', con=engine)
+
         exists = False
+
         for _, row in user_table.iterrows():
             if row["name"] == raw_mat_name:
-                print(row["quantity"])
+                # print(row["quantity"])
                 table_val = row["quantity"]
                 updated_value = table_val + int(quantity_value)
-                new_raw_mat = Input_Warehouse(name=raw_mat_name, quantity=updated_value)
+                new_raw_mat = Input_Warehouse(
+                    name=raw_mat_name, quantity=updated_value)
                 exists = True
 
         try:
@@ -366,9 +414,54 @@ def warehouse():
         except all:
             return "Pojavio se problem! Pokušajte ponovno."
 
-    else:
-        raw_mat = Input_Warehouse.query.order_by(Input_Warehouse.id)
-        return render_template("warehouse.html", sirovac=raw_mat)
+    return warehouse_page()
+
+
+@app.route("/second_btn", methods=["POST", "GET"])
+def second_button():
+    if request.method == "POST":
+        raw_mat_name = request.form["new_part"]
+        quantity_value = request.form["kolicina_1"]
+
+        new_raw_mat = Warehouse(part_name=raw_mat_name,
+                                part_quantity=quantity_value)
+
+        user_table = pd.read_sql_table(table_name='warehouse', con=engine)
+
+        exists = False
+
+        for _, row in user_table.iterrows():
+            if row["part_name"] == raw_mat_name:
+                table_val = row["part_quantity"]
+                updated_value = table_val + int(quantity_value)
+                new_raw_mat = Warehouse(
+                    part_name=raw_mat_name, part_quantity=updated_value)
+                exists = True
+
+        try:
+            if exists:
+                conn = engine.connect()
+                stmt = (
+                    update(Warehouse)
+                    .where(Warehouse.part_name == raw_mat_name)
+                    .values(part_quantity=updated_value)
+                )
+                conn.execute(stmt)
+            else:
+                db.session.add(new_raw_mat)
+            db.session.commit()
+            return redirect("/warehouse")
+        except all:
+            return "Pojavio se problem! Pokušajte ponovno."
+
+    return warehouse_page()
+
+
+@app.route("/warehouse")
+def warehouse_page():
+    raw_mat = Input_Warehouse.query.order_by(Input_Warehouse.id)
+    part_available = Warehouse.query.order_by(Warehouse.part_name)
+    return render_template("warehouse.html", sirovac=raw_mat, availability=part_available)
 
 
 @app.route("/manufacturing")

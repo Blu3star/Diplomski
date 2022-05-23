@@ -30,8 +30,8 @@
 </div>
 
 
-<form action="warehouse" METHOD="POST">
-    <label for="warehouse">Izaberite sirovac i količinu (u mm) koja je pristigla:</label>
+<form action="first_btn" METHOD="POST" id="form1">
+    <label for="warehouse">Izaberite stavku i količinu (u mm ili kom) koja je pristigla u skladište:</label>
     <input list="sirovci" name="sirovac" id="sirovac">
     <datalist id="sirovci">
         <option value="Celicna sipka 20x20"></option>
@@ -40,7 +40,7 @@
         <option value="Čelična šipka fi30"></option>
     </datalist>
     <input type="number" name="kolicina" id="kolicina">
-    <input type="submit" value="Dodaj" class="btn-secondary">
+    <input type="submit" value="Dodaj" class="btn-secondary" id="botun_1">
 </form>
 <p>Sirovci dostupni na skladištu:</p>
 <table>
@@ -65,5 +65,40 @@
         </td>
     </tr>
 </table>
-
+<br><br>
+<form action="second_btn" METHOD="POST">
+    <label for="warehouse">Izaberite stavku i količinu (u mm ili kom) koja je pristigla u skladište:</label>
+    <input list="new_part" name="new_part" id="new_part">
+    <datalist id="new_part">
+        <option value="Osnovni element 1"></option>
+        <option value="Osnovni element 2"></option>
+        <option value="Osnovni element 3"></option>
+        <option value="Osnovni element 4"></option>
+    </datalist>
+    <input type="number" name="kolicina_1" id="kolicina_1">
+    <input type="submit" value="Dodaj" class="btn-secondary">
+</form>
+<p>Osnovni elementi dostupni na skladištu:</p>
+<table>
+    <tr>
+        <th>Osnovni element</th>
+        <th>Količina (kom)</th>
+    </tr>
+    <tr>
+        <td>
+            {% for warehouse in availability %}
+            <h4>
+                {{warehouse.part_name}}
+            </h4>
+            {% endfor %}
+        </td>
+        <td>
+            {% for warehouse in availability %}
+            <h4 class="podatak">
+                {{warehouse.part_quantity}}
+            </h4>
+            {% endfor %}
+        </td>
+    </tr>
+</table>
 {% endblock %}

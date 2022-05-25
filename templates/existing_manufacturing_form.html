@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="existing_manufacturing_form" METHOD="POST">
+        <label for="existing_manufacturing_order_id">Unesite ID narudžbe koju želite nastaviti proizvoditi:</label>
+        <input type="text" id="existing_manufacturing_order_id" name="existing_manufacturing_order_id"><br>
+        <table>
+            <tr>
+                <th>ID narudžbe</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for warehouse in part %}
+                    <h4>
+                        {{warehouse.order_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <br>
+
+        <label for="next_manufacturing_machine_id">Unesite ID stroja na kojem element nastavlja obradu:</label>
+        <input type="text" id="next_manufacturing_machine_id" name="next_manufacturing_machine_id"><br>
+        <table>
+            <tr>
+                <th>ID stroja</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for machines in machine %}
+                    <h4>
+                        {{machines.machine_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <br>
+
+
+        <label for="next_manufacturing_worker_id">Unesite ID operatera koji vrsi obradu:</label>
+        <input type="text" id="next_manufacturing_worker_id" name="next_manufacturing_worker_id"><br>
+        <table>
+            <tr>
+                <th>ID operatera</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for workers in worker %}
+                    <h4>
+                        {{workers.worker_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <br>
+
+        <input type="submit" value="Proizvodi" class="btn-secondary">
+    </form>
+</body>
+
+</html>

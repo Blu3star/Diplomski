@@ -25,11 +25,17 @@
     <button class="btn btn-6" , onclick="window.location.href='/statistic'">Statistika</button>
 </div>
 
+<button class="btn" , onclick="window.location.href='/new_manufacturing_form'">Obrazac za unos podataka o
+    pocetku obrade novog elementa</button>
+<button class="btn" , onclick="window.location.href='/existing_manufacturing_form'">Obrazac za unos podataka o
+    obradi postojeceg elementa</button>
+<button class="btn" , onclick="window.location.href='/finishing_manufacturing_form'">Obrazac za unos podataka o
+    zavrsetku obrade elementa</button>
+
 
 <p>Proizvodi u proizvodnji:</p>
 <table>
     <tr>
-        <th>Redni broj</th>
         <th>ID narudžbe</th>
         <th>ID osnovnog elementa</th>
         <th>ID stroja</th>
@@ -41,49 +47,42 @@
         <th>
             {% for manufacturing in product %}
             <h4>
-                {{auto_id}}
+                {{manufacturing.order_id}}
             </h4>
             {% endfor %}
         </th>
         <th>
             {% for manufacturing in product %}
             <h4>
-                {{order_id}}
+                {{manufacturing.part_id}}
             </h4>
             {% endfor %}
         </th>
         <th>
             {% for manufacturing in product %}
             <h4>
-                {{part_id}}
+                {{manufacturing.machine_id}}
             </h4>
             {% endfor %}
         </th>
         <th>
             {% for manufacturing in product %}
             <h4>
-                {{machine_id}}
+                {{manufacturing.manufacturing_status}}
             </h4>
             {% endfor %}
         </th>
         <th>
             {% for manufacturing in product %}
             <h4>
-                {{manufacturing_status}}
+                {{manufacturing.manufacturing_time}}
             </h4>
             {% endfor %}
         </th>
         <th>
             {% for manufacturing in product %}
             <h4>
-                {{manufacturing_time}}
-            </h4>
-            {% endfor %}
-        </th>
-        <th>
-            {% for manufacturing in product %}
-            <h4>
-                {{manufacturing_worker}}
+                {{manufacturing.manufacturing_worker}}
             </h4>
             {% endfor %}
         </th>

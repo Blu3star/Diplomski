@@ -27,6 +27,7 @@ db.MetaData.reflect(meta_data)
 session = sessionmaker(bind=engine)
 
 ID = -1
+ID_1 = -1
 
 
 class Order(db.Model):
@@ -230,16 +231,26 @@ def putDataInTableWorker():
 class Manufacturing(db.Model):
     __tablename__ = "manufacturing"
     auto_id = db.Column(db.Integer, primary_key=True)
-    part_name = db.Column(db.String(200))
     order_id = db.Column(db.Integer)
     part_id = db.Column(db.Integer)
     machine_id = db.Column(db.Integer)
     manufacturing_status = db.Column(db.String(200))
-    manufacturing_time = db.Column(db.String(200))
+    manufacturing_time = db.Column(db.DateTime, default=datetime.now)
     manufacturing_worker = db.Column(db.Integer)
+
+    first_time = True
 
     def __repr__(self):
         return "<Name %r>" % self.id
+
+    def getLastManufacturingID(self):
+        manufacturing_table = pd.read_sql_table(
+            table_name="manufacturing", con=engine)
+        column_ID_1 = manufacturing_table["part_id"].tolist()
+        if len(column_ID_1):
+            return column_ID_1[-1]
+
+        return 39999
 
 
 class Installation(db.Model):
@@ -252,6 +263,21 @@ class Installation(db.Model):
     installation_status = db.Column(db.String(200))
     installation_time = db.Column(db.String(200))
     installation_worker = db.Column(db.Integer)
+
+    def __repr__(self):
+        return "<Name %r>" % self.id
+
+
+class Finished_product(db.Model):
+    __tablename__ = "finished_product"
+    auto_id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer)
+    order_status = db.Column(db.Integer)
+    buyer_name = db.Column(db.String(500), nullable=False)
+    buyer_contact = db.Column(db.String(500), nullable=False)
+    date_created = db.Column(db.String(500))
+    date_finished = db.Column(db.String(500))
+    price = db.Column(db.Integer)
 
     def __repr__(self):
         return "<Name %r>" % self.id
@@ -466,8 +492,108 @@ def warehouse_page():
 
 @app.route("/manufacturing")
 def manufacturing():
-    product = Order.query.order_by(Order.date_created)
+    product = Manufacturing.query.order_by(Manufacturing.part_id)
     return render_template("manufacturing.html", product=product)
+
+
+@app.route("/new_manufacturing_form", methods=["POST", "GET"])
+def new_manufacturing_form():
+    if request.method == "POST":
+        global ID_1
+        if Manufacturing.first_time:
+            ID_1 = Manufacturing().getLastManufacturingID()
+            Manufacturing.first_time = False
+
+        new_manufacturing_order_id = request.form["new_manufacturing_order_id"]
+        new_manufacturing_machine_id = request.form["new_manufacturing_machine_id"]
+        manufacturing_worker_id = request.form["new_manufacturing_worker_id"]
+        # new_manufacturing_part_id = request.form["new_manufacturing_part_id"]
+
+        table_val_part_name = ""
+        table_val_buyer_name = ""
+        table_val_buyer_contact = ""
+        table_val_order_date = ""
+        table_val_price = 0
+        table_val_fin_date = "Ne"
+
+        order_table = pd.read_sql_table(table_name='order', con=engine)
+
+        for _, row in order_table.iterrows():
+            if row["order_id"] == int(new_manufacturing_order_id):
+                table_val_part_name = row["name"]
+                table_val_buyer_name = row["buyer_name"]
+                table_val_buyer_contact = row["buyer_contact"]
+                table_val_order_date = row["date_created"]
+
+        part_table = pd.read_sql_table(table_name='part', con=engine)
+
+        for _, rows in part_table.iterrows():
+            if rows["part_name"] == table_val_part_name:
+                table_val_price = rows["part_price"]
+
+        almost_fin_product = Finished_product(order_id=new_manufacturing_order_id, order_status=0, buyer_name=table_val_buyer_name,
+                                              buyer_contact=table_val_buyer_contact, date_created=str(table_val_order_date), date_finished=table_val_fin_date, price=table_val_price)
+
+        ID_1 = ID_1+1
+        new_manufacturing_element = Manufacturing(order_id=new_manufacturing_order_id, part_id=ID_1,
+                                                  machine_id=new_manufacturing_machine_id, manufacturing_status=0, manufacturing_worker=manufacturing_worker_id)
+
+        try:
+            db.session.add(new_manufacturing_element)
+            db.session.add(almost_fin_product)
+            Order.query.filter(
+                Order.order_id == int(new_manufacturing_order_id)).delete()
+            db.session.commit()
+            return redirect("/manufacturing")
+        except all:
+            return "Pojavio se problem! Pokušajte ponovno."
+
+    new_operating_worker_id = Worker.query.order_by(Worker.worker_id)
+    starting_machine_for_manufacturing = Machine.query.order_by(
+        Machine.machine_id)
+    new_part_for_manufacture = Order.query.filter(
+        Order.name.startswith('Osnovni element')).all()
+    return render_template("new_manufacturing_form.html", availability=new_part_for_manufacture, machine=starting_machine_for_manufacturing, worker=new_operating_worker_id)
+
+
+@app.route("/existing_manufacturing_form", methods=["POST", "GET"])
+def exisiting_manufacturing_form():
+    if request.method == "POST":
+        existing_manufacturing_order_id = request.form["existing_manufacturing_order_id"]
+        next_manufacturing_machine_id = request.form["next_manufacturing_machine_id"]
+        next_manufacturing_worker_id = request.form["next_manufacturing_worker_id"]
+
+        manufacturing_table = pd.read_sql_table(
+            table_name='manufacturing', con=engine)
+
+        table_val_auto_id = 0
+        table_val_part_id = 0
+
+        for _, row in manufacturing_table.iterrows():
+            if row["order_id"] == int(existing_manufacturing_order_id):
+                table_val_auto_id = row["auto_id"]
+                table_val_part_id = row["part_id"]
+
+        existing_manufacturing_part = Manufacturing(order_id=existing_manufacturing_order_id, part_id=table_val_part_id,
+                                                    machine_id=next_manufacturing_machine_id, manufacturing_status=0, manufacturing_worker=next_manufacturing_worker_id)
+
+        conn = engine.connect()
+        stmt = (update(Manufacturing).where(Manufacturing.auto_id ==
+                table_val_auto_id).values(manufacturing_status=1))
+        conn.execute(stmt)
+
+        try:
+            db.session.add(existing_manufacturing_part)
+            db.session.commit()
+            return redirect("/manufacturing")
+        except all:
+            return "Pojavio se problem! Pokušajte ponovno."
+
+    existing_part_for_manufacture = Manufacturing.query.group_by(
+        Manufacturing.order_id)
+    next_machine_for_manufacturing = Machine.query.order_by(Machine.machine_id)
+    next_operating_worker_id = Worker.query.order_by(Worker.worker_id)
+    return render_template("existing_manufacturing_form.html", part=existing_part_for_manufacture, machine=next_machine_for_manufacturing, worker=next_operating_worker_id)
 
 
 @app.route("/installation")
@@ -475,9 +601,16 @@ def installation():
     return render_template("installation.html")
 
 
+@app.route("/installation_form")
+def installation_form():
+    return render_template("/installation_form.html")
+
+
 @app.route("/finishedproduct")
 def finished_product():
-    return render_template("finishedproduct.html")
+    finished_products = Finished_product.query.order_by(
+        Finished_product.order_id)
+    return render_template("finishedproduct.html", product=finished_products)
 
 
 @app.route("/statistic")
@@ -487,10 +620,10 @@ def statistic():
 
 if __name__ == "__main__":
     HOST = os.environ.get("SERVER_HOST", "localhost")
-    putDataInTablePart()
-    putDataInTableAssembly()
-    putDataInTableMachine()
-    putDataInTableWorker()
+    # putDataInTablePart()
+    # putDataInTableAssembly()
+    # putDataInTableMachine()
+    # putDataInTableWorker()
 
     try:
         PORT = int(os.environ.get("SERVER_PORT", "5555"))

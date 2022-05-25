@@ -28,10 +28,64 @@
 <p>Gotovi proizvodi:</p>
 <table>
     <tr>
-        <th>ID Proizvoda</th>
+        <th>ID narudžbe</th>
+        <th>Status</th>
+        <th>Kupac</th>
+        <th>Kontakt</th>
+        <th>Datum narudžbe</th>
+        <th>Datum zavrsetka proizvodnje</th>
+        <th>Cijena</th>
     </tr>
     <tr>
-        <td>a</td>
+        <th>
+            {% for finproduct in product %}
+            <h4>
+                {{finproduct.order_id}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for finproduct in product %}
+            <h4>
+                {{finproduct.order_status}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for finproduct in product %}
+            <h4>
+                {{finproduct.buyer_name}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for finproduct in product %}
+            <h4>
+                {{finproduct.buyer_contact}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for finproduct in product %}
+            <h4>
+                {{finproduct.date_created}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for finproduct in product %}
+            <h4>
+                {{finproduct.date_finished}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for finproduct in product %}
+            <h4>
+                {{finproduct.price}}
+            </h4>
+            {% endfor %}
+        </th>
     </tr>
 </table>
 

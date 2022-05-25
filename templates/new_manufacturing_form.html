@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="new_manufacturing_form" METHOD="POST">
+        <label for="new_manufacturing_order_id">Upisite ID narudžbe koju želite zapoceti proizvoditi:</label>
+        <input type="text" id="new_manufacturing_order_id" name="new_manufacturing_order_id"><br>
+        <table>
+            <tr>
+                <th>ID narudžbe</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for warehouse in availability %}
+                    <h4>
+                        {{warehouse.order_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+        <br>
+
+        <label for="new_manufacturing_machine_id">Upisite ID stroja na kojem element zapocinje obradu:</label>
+        <input type="text" id="new_manufacturing_machine_id" name="new_manufacturing_machine_id"><br>
+        <table>
+            <tr>
+                <th>ID stroja</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for machines in machine %}
+                    <h4>
+                        {{machines.machine_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <br>
+
+        <label for="new_manufacturing_worker_id">Upisite ID operatera koji vrsi obradu:</label>
+        <input type="text" id="new_manufacturing_worker_id" name="new_manufacturing_worker_id"><br>
+        <table>
+            <tr>
+                <th>ID operatera</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for workers in worker %}
+                    <h4>
+                        {{workers.worker_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <br>
+
+        <label for="new_manufacturing_part_id">Automatsko kreiranje novog ID-a za novi element:</label>
+        <input type="checkbox" id="new_manufacturing_part_id" name="new_manufacturing_part_id" value="Checked"
+            checked="True"><br>
+
+        <input type="submit" value="Proizvodi" class="btn-secondary">
+    </form>
+</body>
+
+</html>

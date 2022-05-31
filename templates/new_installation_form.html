@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="new_installation_form" METHOD="POST">
+        <label for="new_installation_order_id">Upisite ID narudžbe kojoj želite zapoceti proces montaze:</label>
+        <input type="text" id="new_installation_order_id" name="new_installation_order_id"><br>
+        <table>
+            <tr>
+                <th>ID narudžbe</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for warehouse in availability %}
+                    <h4>
+                        {{warehouse.order_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+        <br>
+
+        <label for="new_installation_part_id">Upisite ID osnovnog elementa na kojem se bazira montaza sklopa:</label>
+        <input type="text" id="new_installation_part_id" name="new_installation_part_id"><br>
+        <!-- <table>
+            <tr>
+                <th>ID stroja</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for machines in machine %}
+                    <h4>
+                        {{machines.machine_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table> -->
+
+        <br>
+
+        <label for="new_installation_worker_id">Upisite ID operatera koji vrsi montazu:</label>
+        <input type="text" id="new_installation_worker_id" name="new_installation_worker_id"><br>
+        <table>
+            <tr>
+                <th>ID operatera</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for workers in worker %}
+                    <h4>
+                        {{workers.worker_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <br>
+
+        <label for="new_manufacturing_part_id">Automatsko kreiranje novog ID-a za novi sklop:</label>
+        <input type="checkbox" id="new_installation_part_id" name="new_installation_part_id" value="Checked"
+            checked="True"><br>
+
+        <input type="submit" value="Proizvodi" class="btn-secondary">
+    </form>
+</body>
+
+</html>

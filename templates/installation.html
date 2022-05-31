@@ -25,12 +25,16 @@
     <button class="btn btn-6" , onclick="window.location.href='/statistic'">Statistika</button>
 </div>
 
-<button class="btn" , onclick="window.location.href='/installation_form'">Obrazac za unos podataka o montaži</button>
+<button class="btn" , onclick="window.location.href='/new_installation_form'">Obrazac za unos podataka o pocetku nove
+    montaže</button>
+<button class="btn" , onclick="window.location.href='/existing_installation_form'">Obrazac za unos podataka o
+    nastavljanju procesa montaže</button>
+<button class="btn" , onclick="window.location.href='/finished_installation_form'">Obrazac za unos podataka o zavrsetku
+    procesa montaže</button>
 
 <p>Proizvodi u montaži:</p>
 <table>
     <tr>
-        <th>Redni broj</th>
         <th>ID narudžbe</th>
         <th>ID sklopa</th>
         <th>ID osnovnog elementa</th>
@@ -39,7 +43,48 @@
         <th>Montažer</th>
     </tr>
     <tr>
-
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{manufacturing.order_id}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{manufacturing.installation_id}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{manufacturing.part_id}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{manufacturing.installation_status}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{manufacturing.installation_time}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for manufacturing in product %}
+            <h4>
+                {{manufacturing.installation_worker}}
+            </h4>
+            {% endfor %}
+        </th>
     </tr>
 </table>
 {% endblock %}

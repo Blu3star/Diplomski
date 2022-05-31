@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="existing_installation_form" METHOD="POST">
+        <label for="existing_installation_order_id">Upisite ID narudžbe kojoj nastavljate proces montaze:</label>
+        <input type="text" id="existing_installation_order_id" name="existing_installation_order_id"><br>
+        <table>
+            <tr>
+                <th>ID narudžbe</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for warehouse in assembly %}
+                    <h4>
+                        {{warehouse.order_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+        <br>
+
+        <label for="next_installation_part_id">Upisite ID osnovnog elementa koji se slijedeci montira na
+            sklop:</label>
+        <input type="text" id="next_installation_part_id" name="next_installation_part_id"><br>
+        <!-- <table>
+            <tr>
+                <th>ID stroja</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for machines in machine %}
+                    <h4>
+                        {{machines.machine_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table> -->
+
+        <br>
+
+        <label for="next_installation_worker_id">Upisite ID operatera koji vrsi montazu:</label>
+        <input type="text" id="next_installation_worker_id" name="next_installation_worker_id"><br>
+        <table>
+            <tr>
+                <th>ID operatera</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for workers in worker %}
+                    <h4>
+                        {{workers.worker_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <br>
+
+        <input type="submit" value="Proizvodi" class="btn-secondary">
+    </form>
+</body>
+
+</html>

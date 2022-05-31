@@ -28,6 +28,7 @@ session = sessionmaker(bind=engine)
 
 ID = -1
 ID_1 = -1
+ID_2 = -1
 
 
 class Order(db.Model):
@@ -256,16 +257,26 @@ class Manufacturing(db.Model):
 class Installation(db.Model):
     __tablename__ = "installation"
     auto_id = db.Column(db.Integer, primary_key=True)
-    assembly_name = db.column(db.String(200))
     order_id = db.Column(db.Integer)
     installation_id = db.Column(db.Integer)
     part_id = db.Column(db.Integer)
     installation_status = db.Column(db.String(200))
-    installation_time = db.Column(db.String(200))
+    installation_time = db.Column(db.DateTime, default=datetime.now)
     installation_worker = db.Column(db.Integer)
+
+    first_time = True
 
     def __repr__(self):
         return "<Name %r>" % self.id
+
+    def getLastInstallationID(self):
+        installation_table = pd.read_sql_table(
+            table_name="installation", con=engine)
+        column_ID_2 = installation_table["installation_id"].tolist()
+        if len(column_ID_2):
+            return column_ID_2[-1]
+
+        return 79999
 
 
 class Finished_product(db.Model):
@@ -306,6 +317,21 @@ def getResourceFromWarehouse(part_detail, table, column):
     else:
 
         return -1
+
+
+@app.route("/customer")
+def customer():
+    return render_template("customer.html")
+
+
+@app.route("/customer_order")
+def customerOrder():
+    return render_template("customer_order.html")
+
+
+@app.route("/order_status")
+def orderStatus():
+    return render_template("order_status.html")
 
 
 @app.route("/order", methods=["POST", "GET"])
@@ -589,21 +615,189 @@ def exisiting_manufacturing_form():
         except all:
             return "Pojavio se problem! Pokušajte ponovno."
 
-    existing_part_for_manufacture = Manufacturing.query.group_by(
-        Manufacturing.order_id)
+    existing_part_for_manufacture = Manufacturing.query.filter(
+        Manufacturing.manufacturing_status.startswith('0')).all()
     next_machine_for_manufacturing = Machine.query.order_by(Machine.machine_id)
     next_operating_worker_id = Worker.query.order_by(Worker.worker_id)
     return render_template("existing_manufacturing_form.html", part=existing_part_for_manufacture, machine=next_machine_for_manufacturing, worker=next_operating_worker_id)
 
 
+@app.route("/finishing_manufacturing_form", methods=["POST", "GET"])
+def fin_man_form():
+    if request.method == "POST":
+        fin_man_order_id = request.form["finishing_manufacturing_order_id"]
+        fin_man_time = datetime.now()
+        str_fin_man_time = fin_man_time.strftime("%Y-%m-%d %H:%M:%S.%f")
+
+        manufacturing_table = pd.read_sql_table(
+            table_name='manufacturing', con=engine)
+
+        for _, row in manufacturing_table.iterrows():
+            if row["order_id"] == int(fin_man_order_id):
+                table_val_auto_id = row["auto_id"]
+
+        conn = engine.connect()
+        stmt = (update(Manufacturing).where(Manufacturing.auto_id ==
+                table_val_auto_id).values(manufacturing_status=1))
+        conn.execute(stmt)
+
+        fin_product_table = pd.read_sql_table(
+            table_name='finished_product', con=engine)
+
+        for _, rows in fin_product_table.iterrows():
+            if rows["order_id"] == int(fin_man_order_id):
+                table_value_auto_id = rows["auto_id"]
+
+        conn = engine.connect()
+        stmt_1 = (update(Finished_product).where(Finished_product.auto_id ==
+                  table_value_auto_id).values(order_status=1, date_finished=str_fin_man_time))
+        conn.execute(stmt_1)
+
+        return redirect("/manufacturing")
+
+    finishing_parts = Manufacturing.query.filter(
+        Manufacturing.manufacturing_status.startswith('0')).all()
+    return render_template("finishing_manufacturing_form.html", part=finishing_parts)
+
+
 @app.route("/installation")
 def installation():
-    return render_template("installation.html")
+    product = Installation.query.order_by(Installation.installation_id)
+    return render_template("installation.html", product=product)
 
 
-@app.route("/installation_form")
-def installation_form():
-    return render_template("/installation_form.html")
+@app.route("/new_installation_form", methods=["POST", "GET"])
+def new_installation_form():
+    if request.method == "POST":
+        global ID_2
+        if Installation.first_time:
+            ID_2 = Installation().getLastInstallationID()
+            Installation.first_time = False
+
+        new_inst_order_id = request.form["new_installation_order_id"]
+        new_inst_part_id = request.form["new_installation_part_id"]
+        new_inst_worker_id = request.form["new_installation_worker_id"]
+
+        table_val_assembly_name = ""
+        table_val_buyer_name = ""
+        table_val_buyer_contact = ""
+        table_val_order_date = ""
+        table_val_price = 0
+        table_val_fin_date = "Ne"
+
+        order_table = pd.read_sql_table(table_name='order', con=engine)
+
+        for _, row in order_table.iterrows():
+            if row["order_id"] == int(new_inst_order_id):
+                table_val_assembly_name = row["name"]
+                table_val_buyer_name = row["buyer_name"]
+                table_val_buyer_contact = row["buyer_contact"]
+                table_val_order_date = row["date_created"]
+
+        assembly_table = pd.read_sql_table(table_name='assembly', con=engine)
+
+        for _, rows in assembly_table.iterrows():
+            if rows["assembly_name"] == table_val_assembly_name:
+                table_val_price = rows["assembly_price"]
+
+        almost_fin_product = Finished_product(order_id=new_inst_order_id, order_status=0, buyer_name=table_val_buyer_name,
+                                              buyer_contact=table_val_buyer_contact, date_created=str(table_val_order_date), date_finished=table_val_fin_date, price=table_val_price)
+
+        ID_2 = ID_2+1
+        new_inst_element = Installation(order_id=new_inst_order_id, installation_id=ID_2,
+                                        part_id=new_inst_part_id, installation_status=0, installation_worker=new_inst_worker_id)
+
+        try:
+            db.session.add(new_inst_element)
+            db.session.add(almost_fin_product)
+            Order.query.filter(
+                Order.order_id == int(new_inst_order_id)).delete()
+            db.session.commit()
+            return redirect("/installation")
+        except all:
+            return "Pojavio se problem! Pokušajte ponovno."
+
+    new_part_for_install = Order.query.filter(
+        Order.name.startswith('Sklop')).all()
+    new_assembly_worker_id = Worker.query.order_by(Worker.worker_id)
+    return render_template("/new_installation_form.html", availability=new_part_for_install, worker=new_assembly_worker_id)
+
+
+@app.route("/existing_installation_form", methods=["POST", "GET"])
+def existing_installation_form():
+    if request.method == "POST":
+        existing_inst_order_id = request.form["existing_installation_order_id"]
+        next_inst_part_id = request.form["next_installation_part_id"]
+        next_inst_worker_id = request.form["next_installation_worker_id"]
+
+        installation_table = pd.read_sql_table(
+            table_name='installation', con=engine)
+
+        table_val_auto_id = 0
+        table_val_installation_id = 0
+
+        for _, row in installation_table.iterrows():
+            if row["order_id"] == int(existing_inst_order_id):
+                table_val_auto_id = row["auto_id"]
+                table_val_installation_id = row["installation_id"]
+
+        existing_inst_part = Installation(order_id=existing_inst_order_id, installation_id=table_val_installation_id,
+                                          part_id=next_inst_part_id, installation_status=0, installation_worker=next_inst_worker_id)
+
+        conn = engine.connect()
+        stmt = (update(Installation).where(Installation.auto_id ==
+                table_val_auto_id).values(installation_status=1))
+        conn.execute(stmt)
+
+        try:
+            db.session.add(existing_inst_part)
+            db.session.commit()
+            return redirect("/installation")
+        except all:
+            return "Pojavio se problem! Pokušajte ponovno."
+
+    existing_assembly_for_installation = Installation.query.filter(
+        Installation.installation_status.startswith('0')).all()
+    next_assembly_worker_id = Worker.query.order_by(Worker.worker_id)
+    return render_template("/existing_installation_form.html", assembly=existing_assembly_for_installation, worker=next_assembly_worker_id)
+
+
+@app.route("/finished_installation_form", methods=["POST", "GET"])
+def finished_installation_form():
+    if request.method == "POST":
+        fin_inst_order_id = request.form["finished_installation_order_id"]
+        fin_inst_time = datetime.now()
+        str_fin_inst_time = fin_inst_time.strftime("%Y-%m-%d %H:%M:%S.%f")
+
+        installation_table = pd.read_sql_table(
+            table_name='installation', con=engine)
+
+        for _, row in installation_table.iterrows():
+            if row["order_id"] == int(fin_inst_order_id):
+                table_val_auto_id = row["auto_id"]
+
+        conn = engine.connect()
+        stmt = (update(Installation).where(Installation.auto_id ==
+                table_val_auto_id).values(installation_status=1))
+        conn.execute(stmt)
+
+        fin_product_table = pd.read_sql_table(
+            table_name='finished_product', con=engine)
+
+        for _, rows in fin_product_table.iterrows():
+            if rows["order_id"] == int(fin_inst_order_id):
+                table_value_auto_id = rows["auto_id"]
+
+        conn = engine.connect()
+        stmt_1 = (update(Finished_product).where(Finished_product.auto_id ==
+                  table_value_auto_id).values(order_status=1, date_finished=str_fin_inst_time))
+        conn.execute(stmt_1)
+
+        return redirect("/installation")
+
+    finishing_parts = Installation.query.filter(
+        Installation.installation_status.startswith('0')).all()
+    return render_template("/finished_installation_form.html", installation=finishing_parts)
 
 
 @app.route("/finishedproduct")

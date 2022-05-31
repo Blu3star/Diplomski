@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="finishing_manufacturing_form" METHOD="POST">
+        <label for="finishing_manufacturing_order_id">Unesite ID narudžbe koju želite zavrsiti proizvoditi:</label>
+        <input type="text" id="finishing_manufacturing_order_id" name="finishing_manufacturing_order_id"><br>
+        <table>
+            <tr>
+                <th>ID narudžbe</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for warehouse in part %}
+                    <h4>
+                        {{warehouse.order_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <br>
+
+        <input type="submit" value="Zavrsi" class="btn-secondary">
+    </form>
+</body>
+
+</html>

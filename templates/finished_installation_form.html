@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="finished_installation_form" METHOD="POST">
+        <label for="finished_installation_order_id">Unesite ID narudžbe kojoj želite zakljuciti proces montaze:</label>
+        <input type="text" id="finished_installation_order_id" name="finished_installation_order_id"><br>
+        <table>
+            <tr>
+                <th>ID narudžbe</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for warehouse in installation %}
+                    <h4>
+                        {{warehouse.order_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <br>
+
+        <input type="submit" value="Zavrsi" class="btn-secondary">
+    </form>
+</body>
+
+</html>

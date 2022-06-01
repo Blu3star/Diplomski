@@ -17,8 +17,8 @@ with open("part.json", "r") as f_p:
 
 with open("assembly.json", "r") as f_a:
     j_assembly_data = json.load(f_a)
-print(j_part_data)
-print(j_assembly_data)
+# print(j_part_data)
+# print(j_assembly_data)
 
 
 engine = create_engine("sqlite:///database.db", echo=False)
@@ -293,10 +293,24 @@ class Finished_product(db.Model):
     def __repr__(self):
         return "<Name %r>" % self.id
 
+    def getLastOrderID(self):
+        fin_prod_table = pd.read_sql_table(
+            table_name="finished_product", con=engine)
+        column_ID = fin_prod_table["order_id"].tolist()
+        if len(column_ID):
+            return column_ID[-1]
+
+        return 9999
+
 
 @app.route("/")
 def index():
     return render_template("index.html")
+
+
+@app.route("/index_1")
+def index1():
+    return render_template("index_1.html")
 
 
 def getResourceFromWarehouse(part_detail, table, column):
@@ -324,13 +338,115 @@ def customer():
     return render_template("customer.html")
 
 
-@app.route("/customer_order")
+@app.route("/customer_order", methods=["POST", "GET"])
 def customerOrder():
-    return render_template("customer_order.html")
+    global ID
+    if Order.first_time:
+        order_id = Order().getLastOrderID()
+        fin_prod_order_id = Finished_product().getLastOrderID()
+        if order_id >= fin_prod_order_id:
+            ID = order_id
+        else:
+            ID = fin_prod_order_id
+        Order.first_time = False
+
+    if request.method == "POST":
+        customer_order = request.form["new_customer_order"]
+        customer_name = request.form["customer_name"]
+        customer_contact = request.form["customer_phone"]
+
+        ID = ID + 1
+        new_customer_order = Order(
+            name=customer_order, buyer_name=customer_name, buyer_contact=customer_contact, order_id=ID)
+
+        for part_name in j_part_data:
+
+            if customer_order == part_name:
+
+                if type(j_part_data[part_name]) == type([]):
+
+                    for part_details in j_part_data[part_name]:
+
+                        part_raw_mat_name = part_details[list(
+                            part_details.keys())[0]]
+                        part_raw_mat_length = part_details[list(
+                            part_details.keys())[1]]
+                        length_in_stock = getResourceFromWarehouse(
+                            part_raw_mat_name, "input_warehouse", "name")
+
+                        if length_in_stock >= int(part_raw_mat_length):
+
+                            new_value = length_in_stock - \
+                                int(part_raw_mat_length)
+                            conn = engine.connect()
+                            stmt = (
+                                update(Input_Warehouse)
+                                .where(Input_Warehouse.name == part_raw_mat_name)
+                                .values(quantity=new_value)
+                            )
+                            conn.execute(stmt)
+                            db.session.add(new_customer_order)
+                            db.session.commit()
+                            return str(ID)
+
+                        else:
+
+                            return "Trenutno niste u mogucnosti naruciti ovaj proizvod, molim kontaktirajte nas za vise informacija."
+
+        for assembly_name in j_assembly_data:
+
+            if customer_order == assembly_name:
+
+                if type(j_assembly_data[assembly_name]) == type([]):
+
+                    for assembly_details in j_assembly_data[assembly_name]:
+
+                        for assembly_detail in assembly_details:
+                            needed_part_name = assembly_detail
+                            needed_part_quantity = assembly_details[assembly_detail]
+
+                            quantity_in_stock = getResourceFromWarehouse(
+                                needed_part_name, "warehouse", "part_name")
+
+                            if quantity_in_stock >= int(needed_part_quantity):
+                                new_part_value = quantity_in_stock - \
+                                    int(needed_part_quantity)
+                                conn = engine.connect()
+                                stmt = (update(Warehouse).where(
+                                    Warehouse.part_name == needed_part_name).values(part_quantity=new_part_value))
+                                conn.execute(stmt)
+                                db.session.add(new_customer_order)
+                                db.session.commit()
+                                return str(ID)
+                            else:
+                                return "Trenutno niste u mogucnosti naruciti ovaj proizvod, molim kontaktirajte nas za vise informacija."
+
+        try:
+            db.session.add(new_customer_order)
+            db.session.commit()
+            return redirect("/customer_order")
+        except all:
+            return "Pojavio se problem! Pokušajte ponovno."
+
+    part_available = Part.query.order_by(Part.part_name)
+    assembly_available = Assembly.query.order_by(Assembly.assembly_name)
+    return render_template("customer_order.html", part=part_available, assembly=assembly_available)
 
 
-@app.route("/order_status")
+@app.route("/order_status", methods=["POST", "GET"])
 def orderStatus():
+    if request.method == "POST":
+        customer_order = request.form["customer_order_id"]
+
+        fin_product_table = pd.read_sql_table(
+            table_name='finished_product', con=engine)
+
+        for _, row in fin_product_table.iterrows():
+            if row["order_id"] == int(customer_order):
+                return dict(row)
+
+        return "Unijeli ste nepostojeci ID ili jos nije krenula proizvodnja vase narudzbe."
+
     return render_template("order_status.html")
 
 
@@ -338,7 +454,12 @@ def orderStatus():
 def order():
     global ID
     if Order.first_time:
-        ID = Order().getLastOrderID()
+        order_id = Order().getLastOrderID()
+        fin_prod_order_id = Finished_product().getLastOrderID()
+        if order_id >= fin_prod_order_id:
+            ID = order_id
+        else:
+            ID = fin_prod_order_id
         Order.first_time = False
 
     if request.method == "POST":
@@ -412,6 +533,7 @@ def order():
                                 conn.execute(stmt)
                                 db.session.add(new_product)
                                 db.session.commit()
+                                return redirect("/order")
                             else:
                                 return "Nema dovoljne količine osnovnih elemenata na skladištu!"
 
@@ -746,7 +868,7 @@ def existing_installation_form():
 
         conn = engine.connect()
         stmt = (update(Installation).where(Installation.auto_id ==
-                table_val_auto_id).values(installation_status=1))
+                                           table_val_auto_id).values(installation_status=1))
         conn.execute(stmt)
 
         try:
@@ -762,7 +884,7 @@ def existing_installation_form():
     return render_template("/existing_installation_form.html", assembly=existing_assembly_for_installation, worker=next_assembly_worker_id)
 
 
-@app.route("/finished_installation_form", methods=["POST", "GET"])
+@ app.route("/finished_installation_form", methods=["POST", "GET"])
 def finished_installation_form():
     if request.method == "POST":
         fin_inst_order_id = request.form["finished_installation_order_id"]
@@ -778,7 +900,7 @@ def finished_installation_form():
 
         conn = engine.connect()
         stmt = (update(Installation).where(Installation.auto_id ==
-                table_val_auto_id).values(installation_status=1))
+                                           table_val_auto_id).values(installation_status=1))
         conn.execute(stmt)
 
         fin_product_table = pd.read_sql_table(
@@ -790,7 +912,7 @@ def finished_installation_form():
 
         conn = engine.connect()
         stmt_1 = (update(Finished_product).where(Finished_product.auto_id ==
-                  table_value_auto_id).values(order_status=1, date_finished=str_fin_inst_time))
+                                                 table_value_auto_id).values(order_status=1, date_finished=str_fin_inst_time))
         conn.execute(stmt_1)
 
         return redirect("/installation")
@@ -800,14 +922,14 @@ def finished_installation_form():
     return render_template("/finished_installation_form.html", installation=finishing_parts)
 
 
-@app.route("/finishedproduct")
+@ app.route("/finishedproduct")
 def finished_product():
     finished_products = Finished_product.query.order_by(
         Finished_product.order_id)
     return render_template("finishedproduct.html", product=finished_products)
 
 
-@app.route("/statistic")
+@ app.route("/statistic")
 def statistic():
     return render_template("statistic.html")
 

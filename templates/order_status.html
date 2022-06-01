@@ -14,4 +14,10 @@
     <button class="btn btn-1" , onclick="window.location.href='/customer_order'">Naruci proizvod</button>
     <button class="btn btn-2" , onclick="window.location.href='/order_status'">Provjeri status narudžbe</button>
 </div>
+
+<form action="order_status" METHOD="POST">
+    <label for="customer_order_id">Upisite ID narudzbe kojoj zelite provjeriti status:</label>
+    <input type="text" id="customer_order_id" name="customer_order_id"><br>
+    <input type="submit" value="Provjeri" class="btn-secondary"><br>
+</form>
 {% endblock %}

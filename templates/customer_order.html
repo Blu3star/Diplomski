@@ -2,7 +2,12 @@
 
 {% block head %}
 <style>
-
+    table,
+    th,
+    td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
 </style>
 <title>Ime firme</title>
 {% endblock %}
@@ -14,4 +19,51 @@
     <button class="btn btn-1" , onclick="window.location.href='/customer_order'">Naruci proizvod</button>
     <button class="btn btn-2" , onclick="window.location.href='/order_status'">Provjeri status narudžbe</button>
 </div>
+<h>Paleta dostupnih proizvoda:</h>
+<table>
+    <tr>
+        <th>Osnovni elementi</th>
+    </tr>
+    <tr>
+        <th>
+            {% for parts in part %}
+            <h4>
+                {{parts.part_name}}
+            </h4>
+            {% endfor %}
+        </th>
+    </tr>
+    <tr>
+        <th>Sklopovi</th>
+    </tr>
+    <tr>
+        <th>
+            {% for assemblys in assembly %}
+            <h4>
+                {{assemblys.assembly_name}}
+            </h4>
+            {% endfor %}
+        </th>
+    </tr>
+</table>
+<br>
+<form action="customer_order" METHOD="POST">
+    <label for="new_customer_order">Upisite naziv proizvoda kojeg zelite naruciti:</label>
+    <input type="text" id="new_customer_order" name="new_customer_order"><br>
+    <label for="customer">Ime i prezime kupca:</label>
+    <input type="text" id="customer_name" name="customer_name"><br>
+    <label for="phone">Unesite kontakt broj:</label>
+    <input type="tel" id="customer_phone" name="customer_phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+    <small>Izgled: 123-456-7890</small><br><br>
+    <input type="submit" value="Naruči" class="btn-secondary"><br>
+</form>
+
+{% for orders in order %}
+<h4>
+    {{orders.order_id}}
+</h4>
+{% endfor %}
+
+
+
 {% endblock %}

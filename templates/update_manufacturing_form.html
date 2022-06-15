@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="update_manufacturing_form" METHOD="POST">
+        <label for="update_or_delete">Izaberite radnju koju zelite napraviti:</label><br>
+        <input type="radio" id="update_or_delete" name="update_or_delete" value="1">
+        <label for="delete">Izbrisi podatke</label><br>
+        <input type="radio" id="update_or_delete" name="update_or_delete" value="2">
+        <label for="update">Azuriraj postojece podatke</label><br>
+
+        <h4>Ako zelite IZBRISATI podatke, samo u slijedecem kvadraticu unesite redni broj retka kojeg zelite izbrisati,
+            u drugom slucaju ispunite cijeli obrazac!</h4><br>
+        <label for="row_number">Unesite broj retka:</label>
+        <input type="text" id="row_number" name="row_number"><br>
+        <label for="updated_machine_id">Azuriraj ID stroja:</label>
+        <input type="text" id="updated_machine_id" name="updated_machine_id"><br>
+
+        <table>
+            <tr>
+                <th>ID stroja</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for machines in machine %}
+                    <h4>
+                        {{machines.machine_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <label for="updated_worker_id">Azuriraj ID operatera:</label>
+        <input type="text" id="updated_worker_id" name="updated_worker_id"><br>
+
+        <table>
+            <tr>
+                <th>ID operatera</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for workers in worker %}
+                    <h4>
+                        {{workers.worker_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <input type="submit" value="Azuriraj" class="btn-secondary">
+    </form>
+
+    <p>Proizvodi u proizvodnji:</p>
+    <table>
+        <tr>
+            <th>Redni broj</th>
+            <th>ID narudžbe</th>
+            <th>ID osnovnog elementa</th>
+            <th>ID stroja</th>
+            <th>Status</th>
+            <th>Vrijeme obrade</th>
+            <th>Operater</th>
+        </tr>
+        <tr>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.auto_id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.order_id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.part_id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.machine_id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.manufacturing_status}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.manufacturing_time}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.manufacturing_worker}}
+                </h4>
+                {% endfor %}
+            </th>
+        </tr>
+    </table>
+
+</body>
+
+</html>

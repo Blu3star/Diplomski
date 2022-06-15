@@ -390,9 +390,10 @@ def customerOrder():
                             return str(ID)
 
                         else:
-
+                            ID = ID-1
                             return "Trenutno niste u mogucnosti naruciti ovaj proizvod, molim kontaktirajte nas za vise informacija."
 
+        stmt_array = []
         for assembly_name in j_assembly_data:
 
             if customer_order == assembly_name:
@@ -412,19 +413,23 @@ def customerOrder():
                                 new_part_value = quantity_in_stock - \
                                     int(needed_part_quantity)
                                 conn = engine.connect()
-                                stmt = (update(Warehouse).where(
-                                    Warehouse.part_name == needed_part_name).values(part_quantity=new_part_value))
-                                conn.execute(stmt)
-                                db.session.add(new_customer_order)
-                                db.session.commit()
-                                return str(ID)
+                                stmt_array.append((update(Warehouse).where(
+                                    Warehouse.part_name == needed_part_name).values(part_quantity=new_part_value)))
+                                # conn.execute(stmt)
+                                # db.session.add(new_customer_order)
+                                # db.session.commit()
+                                # return str(ID)
                             else:
+                                ID = ID-1
                                 return "Trenutno niste u mogucnosti naruciti ovaj proizvod, molim kontaktirajte nas za vise informacija."
 
         try:
+            for stmt in stmt_array:
+                conn.execute(stmt)
             db.session.add(new_customer_order)
             db.session.commit()
-            return redirect("/customer_order")
+            return str(ID)
+            # return redirect("/customer_order")
         except all:
             return "Pojavio se problem! Pokušajte ponovno."
 
@@ -506,9 +511,10 @@ def order():
                             return redirect("/order")
 
                         else:
-
+                            ID = ID-1
                             return "Nema dovoljne količine materijala na skladištu!"
 
+        stmt_array = []
         for assembly_name in j_assembly_data:
 
             if product_name == assembly_name:
@@ -528,16 +534,19 @@ def order():
                                 new_part_value = quantity_in_stock - \
                                     int(needed_part_quantity)
                                 conn = engine.connect()
-                                stmt = (update(Warehouse).where(
-                                    Warehouse.part_name == needed_part_name).values(part_quantity=new_part_value))
-                                conn.execute(stmt)
-                                db.session.add(new_product)
-                                db.session.commit()
-                                return redirect("/order")
+                                stmt_array.append((update(Warehouse).where(
+                                    Warehouse.part_name == needed_part_name).values(part_quantity=new_part_value)))
+                                # conn.execute(stmt)
+                                # db.session.add(new_product)
+                                # db.session.commit()
+                                # return redirect("/order")
                             else:
+                                ID = ID-1
                                 return "Nema dovoljne količine osnovnih elemenata na skladištu!"
 
         try:
+            for stmt in stmt_array:
+                conn.execute(stmt)
             db.session.add(new_product)
             db.session.commit()
             return redirect("/order")
@@ -782,6 +791,41 @@ def fin_man_form():
     return render_template("finishing_manufacturing_form.html", part=finishing_parts)
 
 
+@app.route("/update_manufacturing_form", methods=["POST", "GET"])
+def update_man_form():
+    if request.method == "POST":
+        update_action = request.form["update_or_delete"]
+        row_number = request.form["row_number"]
+        updt_machine_id = request.form["updated_machine_id"]
+        updt_worker_id = request.form["updated_worker_id"]
+        updt_man_time = datetime.now()
+
+        if int(update_action) == 1:
+            change_row_before = int(row_number)-1
+
+            conn = engine.connect()
+            stmt = (update(Manufacturing).where(Manufacturing.auto_id ==
+                    change_row_before).values(manufacturing_status=0))
+            conn.execute(stmt)
+
+            Manufacturing.query.filter(
+                Manufacturing.auto_id == int(row_number)).delete()
+            db.session.commit()
+            return redirect("/manufacturing")
+
+        if int(update_action) == 2:
+            conn = engine.connect()
+            stmt = (update(Manufacturing).where(Manufacturing.auto_id == row_number).values(
+                machine_id=updt_machine_id, manufacturing_time=updt_man_time, manufacturing_worker=updt_worker_id))
+            conn.execute(stmt)
+            return redirect("/manufacturing")
+
+    updated_worker_id = Worker.query.order_by(Worker.worker_id)
+    updated_machine_id = Machine.query.order_by(Machine.machine_id)
+    product = Manufacturing.query.order_by(Manufacturing.part_id)
+    return render_template("update_manufacturing_form.html", product=product, worker=updated_worker_id, machine=updated_machine_id)
+
+
 @app.route("/installation")
 def installation():
     product = Installation.query.order_by(Installation.installation_id)
@@ -920,6 +964,41 @@ def finished_installation_form():
     finishing_parts = Installation.query.filter(
         Installation.installation_status.startswith('0')).all()
     return render_template("/finished_installation_form.html", installation=finishing_parts)
+
+
+@app.route("/update_installation_form", methods=["POST", "GET"])
+def update_inst_form():
+    if request.method == "POST":
+        update_action = request.form["delete_or_update"]
+        row_number = request.form["row_number"]
+        updt_part_id = request.form["update_part_id"]
+        updt_worker_id = request.form["updated_worker_id"]
+        updt_man_time = datetime.now()
+        print(update_action)
+
+        if int(update_action) == 1:
+            change_row_before = int(row_number)-1
+
+            conn = engine.connect()
+            stmt = (update(Installation).where(Installation.auto_id ==
+                    change_row_before).values(installation_status=0))
+            conn.execute(stmt)
+
+            Installation.query.filter(
+                Installation.auto_id == int(row_number)).delete()
+            db.session.commit()
+            return redirect("/installation")
+
+        if int(update_action) == 2:
+            conn = engine.connect()
+            stmt = (update(Installation).where(Installation.auto_id == row_number).values(
+                part_id=updt_part_id, installation_time=updt_man_time, installation_worker=updt_worker_id))
+            conn.execute(stmt)
+            return redirect("/installation")
+
+    updated_worker_id = Worker.query.order_by(Worker.worker_id)
+    product = Installation.query.order_by(Installation.auto_id)
+    return render_template("update_installation_form.html", product=product, worker=updated_worker_id)
 
 
 @ app.route("/finishedproduct")

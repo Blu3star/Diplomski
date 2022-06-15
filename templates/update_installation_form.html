@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+
+<body>
+    <form action="update_installation_form" METHOD="POST">
+        <label for="delete_or_update">Izaberite radnju koju zelite napraviti:</label><br>
+        <input type="radio" id="delete_or_update" name="delete_or_update" value="1">
+        <label for="delete">Izbrisi podatke</label><br>
+        <input type="radio" id="delete_or_update" name="delete_or_update" value="2">
+        <label for="update">Azuriraj postojece podatke</label><br>
+
+        <h4>Ako zelite IZBRISATI podatke, samo u slijedecem kvadraticu unesite redni broj retka kojeg zelite izbrisati,
+            u drugom slucaju ispunite cijeli obrazac!</h4><br>
+        <label for="row_number">Unesite redni broj:</label>
+        <input type="text" id="row_number" name="row_number"><br>
+
+        <label for="update_part_id">Azuriraj ID osnovnog elementa:</label>
+        <input type="text" id="update_part_id" name="update_part_id"><br>
+
+        <label for="updated_worker_id">Azuriraj ID operatera:</label>
+        <input type="text" id="updated_worker_id" name="updated_worker_id"><br>
+
+        <table>
+            <tr>
+                <th>ID operatera</th>
+            </tr>
+            <tr>
+                <th>
+                    {% for workers in worker %}
+                    <h4>
+                        {{workers.worker_id}}
+                    </h4>
+                    {% endfor %}
+                </th>
+            </tr>
+        </table>
+
+        <input type="submit" value="Azuriraj" class="btn-secondary">
+    </form>
+
+    <p>Proizvodi u montaži:</p>
+    <table>
+        <tr>
+            <th>Redni broj</th>
+            <th>ID narudžbe</th>
+            <th>ID sklopa</th>
+            <th>ID osnovnog elementa</th>
+            <th>Status</th>
+            <th>Vrijeme montaže</th>
+            <th>Montažer</th>
+        </tr>
+        <tr>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.auto_id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.order_id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.installation_id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.part_id}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.installation_status}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.installation_time}}
+                </h4>
+                {% endfor %}
+            </th>
+            <th>
+                {% for manufacturing in product %}
+                <h4>
+                    {{manufacturing.installation_worker}}
+                </h4>
+                {% endfor %}
+            </th>
+        </tr>
+    </table>
+
+</body>
+
+</html>

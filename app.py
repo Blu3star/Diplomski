@@ -2,6 +2,7 @@ import json
 from flask import Flask, redirect, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from numpy import size
 from sqlalchemy import create_engine, update
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
@@ -673,7 +674,7 @@ def new_manufacturing_form():
         table_val_buyer_contact = ""
         table_val_order_date = ""
         table_val_price = 0
-        table_val_fin_date = "Ne"
+        table_val_fin_date = "Nedovršeno"
 
         order_table = pd.read_sql_table(table_name='order', con=engine)
 
@@ -760,7 +761,7 @@ def fin_man_form():
     if request.method == "POST":
         fin_man_order_id = request.form["finishing_manufacturing_order_id"]
         fin_man_time = datetime.now()
-        str_fin_man_time = fin_man_time.strftime("%Y-%m-%d %H:%M:%S.%f")
+        str_fin_man_time = fin_man_time.strftime("%Y-%m-%d")
 
         manufacturing_table = pd.read_sql_table(
             table_name='manufacturing', con=engine)
@@ -851,7 +852,7 @@ def new_installation_form():
         table_val_buyer_contact = ""
         table_val_order_date = ""
         table_val_price = 0
-        table_val_fin_date = "Ne"
+        table_val_fin_date = "Nedovršeno"
 
         order_table = pd.read_sql_table(table_name='order', con=engine)
 
@@ -935,7 +936,7 @@ def finished_installation_form():
     if request.method == "POST":
         fin_inst_order_id = request.form["finished_installation_order_id"]
         fin_inst_time = datetime.now()
-        str_fin_inst_time = fin_inst_time.strftime("%Y-%m-%d %H:%M:%S.%f")
+        str_fin_inst_time = fin_inst_time.strftime("%Y-%m-%d")
 
         installation_table = pd.read_sql_table(
             table_name='installation', con=engine)
@@ -1015,23 +1016,30 @@ def statistic():
     fin_prod_table = pd.read_sql_table(
         table_name='finished_product', con=engine)
 
-    name_list = []
+    # name_list = []
 
-    for _, row in fin_prod_table.iterrows():
-        if row["product_name"] not in name_list:
-            name_list.append(row["product_name"])
+    # for _, row in fin_prod_table.iterrows():
+    #     if row["product_name"] not in name_list:
+    #         name_list.append(row["product_name"])
 
     number_of_names = fin_prod_table.groupby(['product_name']).size()
+    price_list = fin_prod_table.groupby(['date_finished'])['price'].sum()
 
-    plt.pie(number_of_names, labels=name_list,
-            autopct='%1.1f%%', shadow=True, startangle=0)
+    plt.pie(number_of_names, labels=number_of_names.keys(),
+            autopct='%1.1f%%', startangle=0)
     plt.title('Udio pojedinog prodanog proizvoda od ukupne prodaje')
-    plt.axis('equal')
+    # plt.axis('equal')
 
-    plt.savefig('pie_chart.png')
-    # print(name_list)
-    # print(number_of_names)
-    # plt.show()
+    plt.savefig('image/pie_chart.png')
+
+    plt.subplot(122)
+    plt.figure(figsize=(10, 5))
+    plt.bar(price_list.keys(), price_list, width=0.4)
+    plt.xlabel("Datum")
+    plt.ylabel("Prihod")
+    plt.title("Graf prihoda po danu")
+
+    plt.savefig('image/bar_chart.png')
 
     return render_template("statistic.html")
 

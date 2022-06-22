@@ -6,6 +6,7 @@ from sqlalchemy import create_engine, update
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 import os
+from matplotlib import pyplot as plt
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
@@ -93,19 +94,19 @@ def putDataInTablePart():
     part_data = [
         Part(
             part_name="Osnovni element 1",
-            part_raw_mat="Čelična šipka 20x20",
+            part_raw_mat="Sirovac 1",
             part_length="100",
             part_price="200",
         ),
         Part(
             part_name="Osnovni element 2",
-            part_raw_mat="Čelična šipka 30x30",
+            part_raw_mat="Sirovac 2",
             part_length="200",
             part_price="300",
         ),
         Part(
             part_name="Osnovni element 3",
-            part_raw_mat="Čelična šipka 20x20",
+            part_raw_mat="Sirovac 3",
             part_length="150",
             part_price="250",
         ),
@@ -288,6 +289,7 @@ class Finished_product(db.Model):
     buyer_contact = db.Column(db.String(500), nullable=False)
     date_created = db.Column(db.String(500))
     date_finished = db.Column(db.String(500))
+    product_name = db.Column(db.String(500))
     price = db.Column(db.Integer)
 
     def __repr__(self):
@@ -391,7 +393,7 @@ def customerOrder():
 
                         else:
                             ID = ID-1
-                            return "Trenutno niste u mogucnosti naruciti ovaj proizvod, molim kontaktirajte nas za vise informacija."
+                            return "Trenutno niste u mogućnosti naručiti ovaj proizvod, molim kontaktirajte nas za više informacija."
 
         stmt_array = []
         for assembly_name in j_assembly_data:
@@ -421,7 +423,7 @@ def customerOrder():
                                 # return str(ID)
                             else:
                                 ID = ID-1
-                                return "Trenutno niste u mogucnosti naruciti ovaj proizvod, molim kontaktirajte nas za vise informacija."
+                                return "Trenutno niste u mogućnosti naručiti ovaj proizvod, molim kontaktirajte nas za više informacija."
 
         try:
             for stmt in stmt_array:
@@ -450,7 +452,7 @@ def orderStatus():
             if row["order_id"] == int(customer_order):
                 return dict(row)
 
-        return "Unijeli ste nepostojeci ID ili jos nije krenula proizvodnja vase narudzbe."
+        return "Unijeli ste nepostojeći ID ili još nije krenula proizvodnja Vaše narudžbe."
 
     return render_template("order_status.html")
 
@@ -689,7 +691,7 @@ def new_manufacturing_form():
                 table_val_price = rows["part_price"]
 
         almost_fin_product = Finished_product(order_id=new_manufacturing_order_id, order_status=0, buyer_name=table_val_buyer_name,
-                                              buyer_contact=table_val_buyer_contact, date_created=str(table_val_order_date), date_finished=table_val_fin_date, price=table_val_price)
+                                              buyer_contact=table_val_buyer_contact, date_created=str(table_val_order_date), date_finished=table_val_fin_date, product_name=table_val_part_name, price=table_val_price)
 
         ID_1 = ID_1+1
         new_manufacturing_element = Manufacturing(order_id=new_manufacturing_order_id, part_id=ID_1,
@@ -867,7 +869,7 @@ def new_installation_form():
                 table_val_price = rows["assembly_price"]
 
         almost_fin_product = Finished_product(order_id=new_inst_order_id, order_status=0, buyer_name=table_val_buyer_name,
-                                              buyer_contact=table_val_buyer_contact, date_created=str(table_val_order_date), date_finished=table_val_fin_date, price=table_val_price)
+                                              buyer_contact=table_val_buyer_contact, date_created=str(table_val_order_date), date_finished=table_val_fin_date, product_name=table_val_assembly_name, price=table_val_price)
 
         ID_2 = ID_2+1
         new_inst_element = Installation(order_id=new_inst_order_id, installation_id=ID_2,
@@ -1010,6 +1012,27 @@ def finished_product():
 
 @ app.route("/statistic")
 def statistic():
+    fin_prod_table = pd.read_sql_table(
+        table_name='finished_product', con=engine)
+
+    name_list = []
+
+    for _, row in fin_prod_table.iterrows():
+        if row["product_name"] not in name_list:
+            name_list.append(row["product_name"])
+
+    number_of_names = fin_prod_table.groupby(['product_name']).size()
+
+    plt.pie(number_of_names, labels=name_list,
+            autopct='%1.1f%%', shadow=True, startangle=0)
+    plt.title('Udio pojedinog prodanog proizvoda od ukupne prodaje')
+    plt.axis('equal')
+
+    plt.savefig('pie_chart.png')
+    # print(name_list)
+    # print(number_of_names)
+    # plt.show()
+
     return render_template("statistic.html")
 
 

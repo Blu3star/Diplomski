@@ -11,12 +11,13 @@
 <div class="content">
     <h1 id="Naslov">Provjerite status svoje narudžbe.</h1>
     <br>
-    <button class="btn btn-1" , onclick="window.location.href='/customer_order'">Naruci proizvod</button>
+    <button class="btn btn-1" , onclick="window.location.href='/customer_order'">Naruči proizvod</button>
     <button class="btn btn-2" , onclick="window.location.href='/order_status'">Provjeri status narudžbe</button>
 </div>
 
 <form action="order_status" METHOD="POST">
-    <label for="customer_order_id">Upisite ID narudzbe kojoj zelite provjeriti status:</label>
+    <br>
+    <label for="customer_order_id">Upišite ID narudžbe kojoj želite provjeriti status:</label>
     <input type="text" id="customer_order_id" name="customer_order_id"><br>
     <input type="submit" value="Provjeri" class="btn-secondary"><br>
 </form>

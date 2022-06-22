@@ -1,19 +1,19 @@
 {
     "Osnovni element 1": [
         {
-            "sirovac": "Celicna sipka 20x20",
+            "sirovac": "Sirovac 1",
             "duljina": "100"
         }
     ],
     "Osnovni element 2": [
         {
-            "sirovac": "Celicna sipka 30x30",
+            "sirovac": "Sirovac 2",
             "duljina": "200"
         }
     ],
     "Osnovni element 3": [
         {
-            "sirovac": "Celicna cijev fi40",
+            "sirovac": "Sirovac 3",
             "duljina": "250"
         }
     ]

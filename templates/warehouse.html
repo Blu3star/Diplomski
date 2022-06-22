@@ -31,13 +31,13 @@
 
 
 <form action="first_btn" METHOD="POST" id="form1">
-    <label for="warehouse">Izaberite stavku i količinu (u mm ili kom) koja je pristigla u skladište:</label>
+    <label for="warehouse">Izaberite stavku i količinu (u mm) koja je pristigla u skladište:</label>
     <input list="sirovci" name="sirovac" id="sirovac">
     <datalist id="sirovci">
-        <option value="Celicna sipka 20x20"></option>
-        <option value="Čelična šipka 30x30"></option>
-        <option value="Čelična šipka fi20"></option>
-        <option value="Čelična šipka fi30"></option>
+        <option value="Sirovac 1"></option>
+        <option value="Sirovac 2"></option>
+        <option value="Sirovac 3"></option>
+        <option value="Sirovac 4"></option>
     </datalist>
     <input type="number" name="kolicina" id="kolicina">
     <input type="submit" value="Dodaj" class="btn-secondary" id="botun_1">
@@ -67,7 +67,7 @@
 </table>
 <br><br>
 <form action="second_btn" METHOD="POST">
-    <label for="warehouse">Izaberite stavku i količinu (u mm ili kom) koja je pristigla u skladište:</label>
+    <label for="warehouse">Izaberite stavku i količinu (u kom) koja je pristigla u skladište:</label>
     <input list="new_part" name="new_part" id="new_part">
     <datalist id="new_part">
         <option value="Osnovni element 1"></option>

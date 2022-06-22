@@ -14,15 +14,16 @@
 
 {% block body %}
 <div class="content">
-    <h1 id="Naslov">Narucite proizvod</h1>
+    <h1 id="Naslov">Naručite proizvod</h1>
     <br>
-    <button class="btn btn-1" , onclick="window.location.href='/customer_order'">Naruci proizvod</button>
+    <button class="btn btn-1" , onclick="window.location.href='/customer_order'">Naruči proizvod</button>
     <button class="btn btn-2" , onclick="window.location.href='/order_status'">Provjeri status narudžbe</button>
 </div>
 <h>Paleta dostupnih proizvoda:</h>
 <table>
     <tr>
         <th>Osnovni elementi</th>
+        <th>Cijena</th>
     </tr>
     <tr>
         <th>
@@ -32,9 +33,17 @@
             </h4>
             {% endfor %}
         </th>
+        <th>
+            {% for parts in part %}
+            <h4>
+                {{parts.part_price}}
+            </h4>
+            {% endfor %}
+        </th>
     </tr>
     <tr>
         <th>Sklopovi</th>
+        <th>Cijena</th>
     </tr>
     <tr>
         <th>
@@ -44,11 +53,18 @@
             </h4>
             {% endfor %}
         </th>
+        <th>
+            {% for assemblys in assembly %}
+            <h4>
+                {{assemblys.assembly_price}}
+            </h4>
+            {% endfor %}
+        </th>
     </tr>
 </table>
 <br>
 <form action="customer_order" METHOD="POST">
-    <label for="new_customer_order">Upisite naziv proizvoda kojeg zelite naruciti:</label>
+    <label for="new_customer_order">Upišite naziv proizvoda kojeg želite naručiti:</label>
     <input type="text" id="new_customer_order" name="new_customer_order"><br>
     <label for="customer">Ime i prezime kupca:</label>
     <input type="text" id="customer_name" name="customer_name"><br>

@@ -34,6 +34,7 @@
         <th>Kontakt</th>
         <th>Datum narudžbe</th>
         <th>Datum zavrsetka proizvodnje</th>
+        <th>Naziv proizvoda</th>
         <th>Cijena</th>
     </tr>
     <tr>
@@ -76,6 +77,13 @@
             {% for finproduct in product %}
             <h4>
                 {{finproduct.date_finished}}
+            </h4>
+            {% endfor %}
+        </th>
+        <th>
+            {% for finproduct in product %}
+            <h4>
+                {{finproduct.product_name}}
             </h4>
             {% endfor %}
         </th>

@@ -1,3 +1,5 @@
+from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 import json
 from flask import Flask, redirect, render_template, request
 from flask_sqlalchemy import SQLAlchemy
@@ -7,7 +9,8 @@ from sqlalchemy import create_engine, update
 from sqlalchemy.orm import sessionmaker
 import pandas as pd
 import os
-from matplotlib import pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
@@ -1016,23 +1019,17 @@ def statistic():
     fin_prod_table = pd.read_sql_table(
         table_name='finished_product', con=engine)
 
-    # name_list = []
-
-    # for _, row in fin_prod_table.iterrows():
-    #     if row["product_name"] not in name_list:
-    #         name_list.append(row["product_name"])
-
     number_of_names = fin_prod_table.groupby(['product_name']).size()
     price_list = fin_prod_table.groupby(['date_finished'])['price'].sum()
 
+    plt.figure(1)
     plt.pie(number_of_names, labels=number_of_names.keys(),
             autopct='%1.1f%%', startangle=0)
     plt.title('Udio pojedinog prodanog proizvoda od ukupne prodaje')
-    # plt.axis('equal')
 
     plt.savefig('image/pie_chart.png')
 
-    plt.subplot(122)
+    plt.figure(2)
     plt.figure(figsize=(10, 5))
     plt.bar(price_list.keys(), price_list, width=0.4)
     plt.xlabel("Datum")
